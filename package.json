@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@tamagui/config": "^1.102.1",
+    "@tensorflow/tfjs": "^4.20.0",
+    "@tensorflow/tfjs-react-native": "^1.0.0",
     "react": "18.2.0",
     "react-native": "0.74.3",
     "tamagui": "^1.102.1"

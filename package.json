@@ -17,6 +17,7 @@
     "@tensorflow/tfjs-react-native": "^1.0.0",
     "react": "18.2.0",
     "react-native": "0.74.3",
+    "react-native-camera": "^4.2.1",
     "tamagui": "^1.108.2"
   },
   "devDependencies": {

@@ -1,0 +1,31 @@
+name: Create Pull Request
+
+on:
+  push:
+    branches:
+      - develop  # Trigger the action when changes are pushed to the develop branch
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6.1.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Automated changes"
+        committer: "Your Name <your-email@example.com>"
+        author: "Your Name <your-email@example.com>"
+        branch: "auto-pr-branch"
+        delete-branch: true
+        base: "main"
+        title: "Automated PR"
+        body: "This pull request contains automated changes."
+        labels: "automated, ci"
+        assignees: "your-github-username"
+        reviewers: "reviewer-username"
+        draft: false

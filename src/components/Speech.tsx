@@ -1,5 +1,12 @@
-import React, {useState} from 'react';
-import {View, Button, PermissionsAndroid, Platform, Text} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Button,
+  PermissionsAndroid,
+  Platform,
+  Text,
+  StyleSheet,
+} from 'react-native';
 import Voice from '@react-native-voice/voice';
 
 export const Speech: React.FC = () => {
@@ -33,7 +40,10 @@ export const Speech: React.FC = () => {
   const startRecognition = async () => {
     setResults([]);
     try {
-      await Voice.start('th-TH');
+      await Voice.start('th-TH', {
+        RECOGNIZER_ENGINE: 'services',
+        EXTRA_PARTIAL_RESULTS: true,
+      });
       setIsRecognizing(true);
     } catch (e) {
       console.error(e);
@@ -49,23 +59,44 @@ export const Speech: React.FC = () => {
     }
   };
 
-  Voice.onSpeechResults = (e: any) => {
-    setResults(e.value);
-  };
-
-  Voice.onSpeechError = (e: any) => {
-    console.error(e);
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     requestMicrophonePermission();
+    Voice.onSpeechResults = (e: any) => {
+      setResults(e.value);
+      handleSpeechResults(e.value);
+    };
+    Voice.onSpeechError = (e: any) => {
+      console.error(e);
+    };
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
 
+  const handleSpeechResults = (results: string[]) => {
+    results.forEach(result => {
+      switch (result) {
+        case 'ป้ายรถ':
+          console.log('1');
+          break;
+        case 'นำทาง':
+          console.log('2');
+          break;
+        case 'ดูทาง':
+          console.log('3');
+          break;
+        case 'เลขสาย':
+          console.log('4');
+          break;
+        default:
+          console.log('No match found');
+          break;
+      }
+    });
+  };
+
   return (
-    <View>
+    <View style={styles.mainView}>
       <Button
         title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
         onPress={isRecognizing ? stopRecognition : startRecognition}
@@ -76,3 +107,9 @@ export const Speech: React.FC = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  mainView: {
+    marginTop: 50,
+  },
+});

@@ -6,8 +6,11 @@ import {
   Platform,
   Text,
   StyleSheet,
+  Modal,
+  Alert,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
+import {log} from '@tensorflow/tfjs';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
@@ -40,10 +43,11 @@ export const Speech: React.FC = () => {
   const startRecognition = async () => {
     setResults([]);
     try {
-      await Voice.start('th-TH', {
+      const data = await Voice.start('th-TH', {
         RECOGNIZER_ENGINE: 'services',
         EXTRA_PARTIAL_RESULTS: true,
       });
+      console.log(data);
       setIsRecognizing(true);
     } catch (e) {
       console.error(e);
@@ -87,6 +91,9 @@ export const Speech: React.FC = () => {
           break;
         case 'เลขสาย':
           console.log('4');
+          break;
+        case 'เปิดกล้อง':
+          Alert.alert('เปิดกล้องเรียบร้อย');
           break;
         default:
           console.log('No match found');

@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  Button,
   PermissionsAndroid,
   Platform,
   Text,
@@ -11,6 +10,8 @@ import {
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import {log} from '@tensorflow/tfjs';
+import {Button} from 'tamagui';
+import Tts from 'react-native-tts';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
@@ -81,19 +82,24 @@ export const Speech: React.FC = () => {
     results.forEach(result => {
       switch (result) {
         case 'ป้ายรถ':
-          console.log('1');
+          Alert.alert('ค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
+
           break;
         case 'นำทาง':
-          console.log('2');
+          Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
+
           break;
-        case 'ดูทาง':
-          console.log('3');
-          break;
-        case 'เลขสาย':
-          console.log('4');
-          break;
+        // case 'ดูทาง':
+        //   Alert.alert('เปิดกล้องเรียบร้อย');
+
+        //   break;
+        // case 'เลขสาย':
+        //   Alert.alert('เปิดกล้องเรียบร้อย');
+
+        //   break;
         case 'เปิดกล้อง':
           Alert.alert('เปิดกล้องเรียบร้อย');
+          Tts.speak('Hello, world!');
           break;
         default:
           console.log('No match found');
@@ -105,9 +111,17 @@ export const Speech: React.FC = () => {
   return (
     <View style={styles.mainView}>
       <Button
+        alignSelf="center"
+        style={{backgroundColor: 'green'}}
+        size="$10"
+        color={'white'}
+        onPress={isRecognizing ? stopRecognition : startRecognition}>
+        {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
+      </Button>
+      {/* <Button
         title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
         onPress={isRecognizing ? stopRecognition : startRecognition}
-      />
+      /> */}
       {results.map((result, index) => (
         <Text key={index}>{result}</Text>
       ))}

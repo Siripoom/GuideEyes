@@ -1,6 +1,17 @@
-import React, {useState} from 'react';
-import {View, Button, PermissionsAndroid, Platform, Text} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  PermissionsAndroid,
+  Platform,
+  Text,
+  StyleSheet,
+  Modal,
+  Alert,
+} from 'react-native';
 import Voice from '@react-native-voice/voice';
+import {log} from '@tensorflow/tfjs';
+import {Button} from 'tamagui';
+import Tts from 'react-native-tts';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
@@ -33,7 +44,11 @@ export const Speech: React.FC = () => {
   const startRecognition = async () => {
     setResults([]);
     try {
-      await Voice.start('th-TH');
+      const data = await Voice.start('th-TH', {
+        RECOGNIZER_ENGINE: 'services',
+        EXTRA_PARTIAL_RESULTS: true,
+      });
+      console.log(data);
       setIsRecognizing(true);
     } catch (e) {
       console.error(e);
@@ -49,30 +64,73 @@ export const Speech: React.FC = () => {
     }
   };
 
-  Voice.onSpeechResults = (e: any) => {
-    setResults(e.value);
-  };
-
-  Voice.onSpeechError = (e: any) => {
-    console.error(e);
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     requestMicrophonePermission();
+    Voice.onSpeechResults = (e: any) => {
+      setResults(e.value);
+      handleSpeechResults(e.value);
+    };
+    Voice.onSpeechError = (e: any) => {
+      console.error(e);
+    };
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
 
+  const handleSpeechResults = (results: string[]) => {
+    results.forEach(result => {
+      switch (result) {
+        case 'ป้ายรถ':
+          Alert.alert('ค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
+
+          break;
+        case 'นำทาง':
+          Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
+
+          break;
+        // case 'ดูทาง':
+        //   Alert.alert('เปิดกล้องเรียบร้อย');
+
+        //   break;
+        // case 'เลขสาย':
+        //   Alert.alert('เปิดกล้องเรียบร้อย');
+
+        //   break;
+        case 'เปิดกล้อง':
+          Alert.alert('เปิดกล้องเรียบร้อย');
+          Tts.speak('Hello, world!');
+          break;
+        default:
+          console.log('No match found');
+          break;
+      }
+    });
+  };
+
   return (
-    <View>
+    <View style={styles.mainView}>
       <Button
+        alignSelf="center"
+        style={{backgroundColor: 'green'}}
+        size="$10"
+        color={'white'}
+        onPress={isRecognizing ? stopRecognition : startRecognition}>
+        {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
+      </Button>
+      {/* <Button
         title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
         onPress={isRecognizing ? stopRecognition : startRecognition}
-      />
+      /> */}
       {results.map((result, index) => (
         <Text key={index}>{result}</Text>
       ))}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  mainView: {
+    marginTop: 50,
+  },
+});

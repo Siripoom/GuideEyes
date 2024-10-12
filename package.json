@@ -18,11 +18,8 @@
     "react": "18.2.0",
     "react-native": "0.74.3",
     "react-native-maps": "^1.17.3",
-<<<<<<< HEAD
     "react-native-vision-camera": "^4.5.3",
-=======
     "react-native-tts": "^4.1.1",
->>>>>>> e0f173a9ece55156a29b02777241210a6abe892e
     "tamagui": "^1.108.2"
   },
   "devDependencies": {

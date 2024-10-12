@@ -13,16 +13,16 @@ declare module '@tamagui/core' {
 }
 
 export default () => {
-  const device = useCameraDevice('back');
-  const {hasPermission} = useCameraPermission();
+  // const device = useCameraDevice('back');
+  // const {hasPermission} = useCameraPermission();
 
-  if (!hasPermission) return <PermissionsPage />;
-  if (device == null) return <NoCameraDeviceError />;
+  // if (!hasPermission) return <PermissionsPage />;
+  // if (device == null) return <NoCameraDeviceError />;
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      {/* <SpeechScreen />
-      <Maps /> */}
-      <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />
+      <SpeechScreen />
+      <Maps />
+      {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
     </TamaguiProvider>
   );
 };

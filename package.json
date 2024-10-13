@@ -17,9 +17,11 @@
     "@tensorflow/tfjs-react-native": "^1.0.0",
     "react": "18.2.0",
     "react-native": "0.74.3",
+    "react-native-geolocation-service": "^5.3.1",
     "react-native-maps": "^1.17.3",
-    "react-native-vision-camera": "^4.5.3",
     "react-native-tts": "^4.1.1",
+    "react-native-vision-camera": "^4.5.3",
+    "react-native-webview": "^13.12.3",
     "tamagui": "^1.108.2"
   },
   "devDependencies": {

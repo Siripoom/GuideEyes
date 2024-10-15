@@ -85,11 +85,10 @@ export const Speech: React.FC = () => {
       switch (result) {
         case 'ป้ายรถ':
           Alert.alert('ค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
-
+          Tts.speak('กำลังค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
           break;
         case 'นำทาง':
           Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
-
           break;
         // case 'ดูทาง':
         //   Alert.alert('เปิดกล้องเรียบร้อย');
@@ -97,7 +96,6 @@ export const Speech: React.FC = () => {
         //   break;
         // case 'เลขสาย':
         //   Alert.alert('เปิดกล้องเรียบร้อย');
-
         //   break;
         case 'เปิดกล้อง':
           Alert.alert('เปิดกล้องเรียบร้อย');
@@ -114,7 +112,13 @@ export const Speech: React.FC = () => {
     <View style={styles.mainView}>
       <Button
         alignSelf="center"
-        style={{backgroundColor: 'green'}}
+        style={{
+          backgroundColor: 'green',
+          width: 300,
+          height: 300,
+          borderRadius: 200,
+          marginBottom: 10,
+        }}
         size="$10"
         color={'white'}
         onPress={isRecognizing ? stopRecognition : startRecognition}>
@@ -133,6 +137,6 @@ export const Speech: React.FC = () => {
 
 const styles = StyleSheet.create({
   mainView: {
-    marginTop: 50,
+    marginTop: 10,
   },
 });

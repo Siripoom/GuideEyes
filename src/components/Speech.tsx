@@ -11,6 +11,7 @@ import {
 import Voice from '@react-native-voice/voice';
 import {log} from '@tensorflow/tfjs';
 import {Button} from 'tamagui';
+import {Mic, MicOff} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 
 export const Speech: React.FC = () => {
@@ -111,9 +112,10 @@ export const Speech: React.FC = () => {
   return (
     <View style={styles.mainView}>
       <Button
+        icon={Mic}
         alignSelf="center"
         style={{
-          backgroundColor: 'green',
+          backgroundColor: isRecognizing ? 'red' : 'green',
           width: 300,
           height: 300,
           borderRadius: 200,
@@ -122,7 +124,7 @@ export const Speech: React.FC = () => {
         size="$10"
         color={'white'}
         onPress={isRecognizing ? stopRecognition : startRecognition}>
-        {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
+        {/* {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'} */}
       </Button>
       {/* <Button
         title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}

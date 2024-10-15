@@ -1,21 +1,28 @@
-import {TamaguiProvider, createTamagui} from '@tamagui/core';
-import {Button} from 'tamagui';
+import React from 'react';
+import {TamaguiProvider, View, createTamagui} from '@tamagui/core';
 import {config} from '@tamagui/config/v3';
-// you usually export this from a tamagui.config.ts file
+import {SpeechScreen} from './src/screens';
+import Maps from './src/components/Maps';
 
 const tamaguiConfig = createTamagui(config);
-// TypeScript types across all Tamagui APIs
 
 type Conf = typeof tamaguiConfig;
 
 declare module '@tamagui/core' {
   interface TamaguiCustomConfig extends Conf {}
 }
+
 export default () => {
+  // const device = useCameraDevice('back');
+  // const {hasPermission} = useCameraPermission();
+
+  // if (!hasPermission) return <PermissionsPage />;
+  // if (device == null) return <NoCameraDeviceError />;
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      {/* your app here */}
-      <Button theme="blue">Hello world</Button>
+      <SpeechScreen />
+      <Maps />
+      {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
     </TamaguiProvider>
   );
 };

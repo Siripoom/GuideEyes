@@ -66,6 +66,8 @@ export const Speech: React.FC = () => {
 
   useEffect(() => {
     requestMicrophonePermission();
+    Tts.setDefaultLanguage('th-TH');
+    Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
     Voice.onSpeechResults = (e: any) => {
       setResults(e.value);
       handleSpeechResults(e.value);
@@ -99,7 +101,7 @@ export const Speech: React.FC = () => {
         //   break;
         case 'เปิดกล้อง':
           Alert.alert('เปิดกล้องเรียบร้อย');
-          Tts.speak('Hello, world!');
+          Tts.speak('เปิดกล้องเรียบร้อย');
           break;
         default:
           console.log('No match found');

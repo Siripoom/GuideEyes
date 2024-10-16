@@ -11,6 +11,7 @@ import {
 import Voice from '@react-native-voice/voice';
 import {log} from '@tensorflow/tfjs';
 import {Button} from 'tamagui';
+import {Mic, MicOff} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 
 export const Speech: React.FC = () => {
@@ -66,6 +67,8 @@ export const Speech: React.FC = () => {
 
   useEffect(() => {
     requestMicrophonePermission();
+    Tts.setDefaultLanguage('th-TH');
+    Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
     Voice.onSpeechResults = (e: any) => {
       setResults(e.value);
       handleSpeechResults(e.value);
@@ -83,11 +86,10 @@ export const Speech: React.FC = () => {
       switch (result) {
         case 'ป้ายรถ':
           Alert.alert('ค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
-
+          Tts.speak('กำลังค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
           break;
         case 'นำทาง':
           Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
-
           break;
         // case 'ดูทาง':
         //   Alert.alert('เปิดกล้องเรียบร้อย');
@@ -95,11 +97,10 @@ export const Speech: React.FC = () => {
         //   break;
         // case 'เลขสาย':
         //   Alert.alert('เปิดกล้องเรียบร้อย');
-
         //   break;
         case 'เปิดกล้อง':
           Alert.alert('เปิดกล้องเรียบร้อย');
-          Tts.speak('Hello, world!');
+          Tts.speak('เปิดกล้องเรียบร้อย');
           break;
         default:
           console.log('No match found');
@@ -111,12 +112,19 @@ export const Speech: React.FC = () => {
   return (
     <View style={styles.mainView}>
       <Button
+        icon={Mic}
         alignSelf="center"
-        style={{backgroundColor: 'green'}}
+        style={{
+          backgroundColor: isRecognizing ? 'red' : 'green',
+          width: 300,
+          height: 300,
+          borderRadius: 200,
+          marginBottom: 10,
+        }}
         size="$10"
         color={'white'}
         onPress={isRecognizing ? stopRecognition : startRecognition}>
-        {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
+        {/* {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'} */}
       </Button>
       {/* <Button
         title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
@@ -131,6 +139,6 @@ export const Speech: React.FC = () => {
 
 const styles = StyleSheet.create({
   mainView: {
-    marginTop: 50,
+    marginTop: 10,
   },
 });

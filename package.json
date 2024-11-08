@@ -10,21 +10,21 @@
     "test": "jest"
   },
   "dependencies": {
-    "@react-native-voice/voice": "^3.1.5",
-    "@tamagui/config": "^1.102.1",
-    "@tamagui/core": "^1.108.2",
-    "@tamagui/lucide-icons": "^1.115.3",
+    "@react-native-voice/voice": "^3.2.4",
+    "@tamagui/config": "^1.116.14",
+    "@tamagui/core": "^1.116.14",
+    "@tamagui/lucide-icons": "^1.116.14",
     "@tensorflow/tfjs": "^4.20.0",
     "@tensorflow/tfjs-react-native": "^1.0.0",
     "react": "18.2.0",
+    "react-dom": "^18.3.1",
     "react-native": "0.74.3",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-maps": "^1.17.3",
-    "react-native-svg": "^15.7.1",
+    "react-native-svg": "^15.8.0",
     "react-native-tts": "^4.1.1",
-    "react-native-vision-camera": "^4.5.3",
     "react-native-webview": "^13.12.3",
-    "tamagui": "^1.115.4"
+    "tamagui": "^1.116.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

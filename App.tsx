@@ -4,6 +4,11 @@ import {config} from '@tamagui/config/v3';
 import {SpeechScreen, SplashScreen} from './src/screens';
 import Maps from './src/components/Maps';
 import Tts from 'react-native-tts';
+import {
+  GestureResponderEvent,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from 'react-native';
 
 const tamaguiConfig = createTamagui(config);
 
@@ -24,7 +29,6 @@ export default () => {
     Tts.setDefaultLanguage('th-TH');
     Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
 
-    // ฟัง event เมื่อการพูดเสร็จสิ้น
     const onTtsFinish = () => {
       setIsShowSplash(false);
     };
@@ -37,7 +41,7 @@ export default () => {
       );
     };
 
-    setTimeout(speakMessage, 3000);
+    setTimeout(speakMessage, 1500);
 
     return () => {
       Tts.removeEventListener('tts-finish', onTtsFinish); // ลบ listener เมื่อ component ถูกทำลาย
@@ -45,11 +49,30 @@ export default () => {
     };
   }, []);
 
+  const handleLongPress = (event: GestureResponderEvent) => {
+    // Stop TTS and navigate immediately
+    Tts.stop();
+    setIsShowSplash(false);
+  };
+
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      {isShowSplash ? <SplashScreen /> : <SpeechScreen />}
-      {!isShowSplash && <Maps />}
-      {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
+      <TouchableWithoutFeedback
+        onLongPress={handleLongPress}
+        delayLongPress={500} // Adjust the delay for long press (default is 500ms)
+      >
+        <View style={styles.container}>
+          {isShowSplash ? <SplashScreen /> : <SpeechScreen />}
+          {!isShowSplash && <Maps />}
+        </View>
+        {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
+      </TouchableWithoutFeedback>
     </TamaguiProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
+// import item from "./item.json"
+import item2 from './item2.json';
 
 interface Location {
   latitude: number;
@@ -94,6 +96,16 @@ const Maps = () => {
         showsUserLocation={true}
         showsMyLocationButton={true}>
         {location && <Marker coordinate={location} title="You are here" />}
+        {item2.map((items, index) => (
+          <Marker
+            key={items.id}
+            coordinate={{
+              latitude: items.latitude,
+              longitude: items.longitude,
+            }}
+            title={items.name}
+          />
+        ))}
       </MapView>
     </View>
   );

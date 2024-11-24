@@ -3,8 +3,10 @@ import {TamaguiProvider, View, createTamagui} from '@tamagui/core';
 import {config} from '@tamagui/config/v3';
 import {SpeechScreen, SplashScreen} from './src/screens';
 import Maps from './src/components/Maps';
+import ObstacleDetectionPage from './src/screens/ObstacleDetectionPage';
 import Tts from 'react-native-tts';
 import {
+  Button,
   GestureResponderEvent,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -19,11 +21,7 @@ declare module '@tamagui/core' {
 }
 
 export default () => {
-  // const device = useCameraDevice('back');
-  // const {hasPermission} = useCameraPermission();
-
-  // if (!hasPermission) return <PermissionsPage />;
-  // if (device == null) return <NoCameraDeviceError />;
+  const [isObstacleDetection, setIsObstacleDetection] = useState(false);
   const [isShowSplash, setIsShowSplash] = useState(true);
   useEffect(() => {
     Tts.setDefaultLanguage('th-TH');
@@ -57,16 +55,20 @@ export default () => {
 
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      <TouchableWithoutFeedback
-        onLongPress={handleLongPress}
-        delayLongPress={500} // Adjust the delay for long press (default is 500ms)
-      >
+      {isShowSplash ? (
+        <SplashScreen />
+      ) : isObstacleDetection ? (
+        <ObstacleDetectionPage />
+      ) : (
         <View style={styles.container}>
-          {isShowSplash ? <SplashScreen /> : <SpeechScreen />}
-          {!isShowSplash && <Maps />}
+          <SpeechScreen />
+          <Maps />
+          <Button
+            title="เปิดฟีเจอร์ตรวจจับสิ่งกีดขวาง"
+            onPress={() => setIsObstacleDetection(true)}
+          />
         </View>
-        {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
-      </TouchableWithoutFeedback>
+      )}
     </TamaguiProvider>
   );
 };
@@ -74,5 +76,7 @@ export default () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -63,7 +63,7 @@ export default () => {
       >
         <View style={styles.container}>
           {isShowSplash ? <SplashScreen /> : <SpeechScreen />}
-          {!isShowSplash && <Maps />}
+          {/* {!isShowSplash && <Maps />} */}
         </View>
         {/* <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />  It's don't work*/}
       </TouchableWithoutFeedback>

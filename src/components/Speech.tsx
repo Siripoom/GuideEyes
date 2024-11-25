@@ -5,18 +5,18 @@ import {
   Platform,
   Text,
   StyleSheet,
-  Modal,
   Alert,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
-import {log} from '@tensorflow/tfjs';
 import {Button} from 'tamagui';
-import {Mic, MicOff} from '@tamagui/lucide-icons';
+import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
+import Maps from './Maps';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [results, setResults] = useState<string[]>([]);
+  const [showMaps, setShowMaps] = useState(false); // State to control Maps functionality
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -33,8 +33,10 @@ export const Speech: React.FC = () => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('การอนุญาตใช้ไมโครโฟนได้รับการอนุมัติ');
+          Tts.speak('การอนุญาตใช้ไมโครโฟนได้รับการอนุมัติ');
         } else {
           console.log('การอนุญาตใช้ไมโครโฟนถูกปฏิเสธ');
+          Tts.speak('การอนุญาตใช้ไมโครโฟนถูกปฏิเสธ');
         }
       } catch (err) {
         console.warn(err);
@@ -45,16 +47,37 @@ export const Speech: React.FC = () => {
   const startRecognition = async () => {
     setResults([]);
     try {
-      const data = await Voice.start('th-TH', {
+      await Voice.start('th-TH', {
         RECOGNIZER_ENGINE: 'services',
         EXTRA_PARTIAL_RESULTS: true,
       });
-      console.log(data);
       setIsRecognizing(true);
     } catch (e) {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    requestMicrophonePermission();
+    Tts.setDefaultLanguage('th-TH');
+    Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
+
+    // Set up Voice events
+    Voice.onSpeechResults = (e: any) => {
+      setResults(e.value);
+      handleSpeechResults(e.value);
+    };
+    Voice.onSpeechEnd = () => {
+      stopRecognition(); // Automatically stop when speech ends
+    };
+    Voice.onSpeechError = (e: any) => {
+      console.error(e);
+    };
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
 
   const stopRecognition = async () => {
     try {
@@ -65,45 +88,24 @@ export const Speech: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    requestMicrophonePermission();
-    Tts.setDefaultLanguage('th-TH');
-    Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
-    Voice.onSpeechResults = (e: any) => {
-      setResults(e.value);
-      handleSpeechResults(e.value);
-    };
-    Voice.onSpeechError = (e: any) => {
-      console.error(e);
-    };
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
   const handleSpeechResults = (results: string[]) => {
     results.forEach(result => {
       switch (result) {
         case 'ป้ายรถ':
-          Alert.alert('ค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
-          Tts.speak('กำลังค้นหาป้ายรถเมล์ที่ใกล้ที่สุด');
+          setShowMaps(true); // Enable Maps functionality
           break;
         case 'นำทาง':
           Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
           break;
-        // case 'ดูทาง':
-        //   Alert.alert('เปิดกล้องเรียบร้อย');
-
-        //   break;
-        // case 'เลขสาย':
-        //   Alert.alert('เปิดกล้องเรียบร้อย');
-        //   break;
         case 'เปิดกล้อง':
           Alert.alert('เปิดกล้องเรียบร้อย');
           Tts.speak('เปิดกล้องเรียบร้อย');
           break;
+        case 'ยกเลิก':
+          Tts.stop();
+          break;
         default:
-          console.log('No match found');
+          Tts.speak('ไม่ตรงกับคำสั่งที่กำหนด');
           break;
       }
     });
@@ -111,6 +113,7 @@ export const Speech: React.FC = () => {
 
   return (
     <View style={styles.mainView}>
+      {showMaps && <Maps />}
       <Button
         icon={Mic}
         alignSelf="center"
@@ -123,16 +126,17 @@ export const Speech: React.FC = () => {
         }}
         size="$10"
         color={'white'}
-        onPress={isRecognizing ? stopRecognition : startRecognition}>
-        {/* {isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'} */}
+        onPress={startRecognition}
+        disabled={isRecognizing}>
+        {/* Button starts recognition */}
       </Button>
-      {/* <Button
-        title={isRecognizing ? 'หยุดการรับรู้' : 'เริ่มการรับรู้'}
-        onPress={isRecognizing ? stopRecognition : startRecognition}
-      /> */}
-      {results.map((result, index) => (
-        <Text key={index}>{result}</Text>
-      ))}
+
+      {/* Show recognition results */}
+      <View style={styles.results}>
+        {results.map((result, index) => (
+          <Text key={index}>{result}</Text>
+        ))}
+      </View>
     </View>
   );
 };
@@ -141,4 +145,10 @@ const styles = StyleSheet.create({
   mainView: {
     marginTop: 10,
   },
+  results: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
 });
+
+export default Speech;

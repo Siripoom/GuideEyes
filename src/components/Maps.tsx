@@ -10,7 +10,7 @@ import {
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
-import {getDistance} from 'geolib'; // Import getDistance
+import {getDistance} from 'geolib';
 import item from './item.json';
 
 interface Location {
@@ -82,7 +82,7 @@ const Maps = () => {
     Tts.speak('กำลังค้นหา'); // Start feedback
 
     // Define the search radius (e.g., 1 km)
-    const SEARCH_RADIUS = 1000; // in meters
+    const SEARCH_RADIUS = 500; // in meters
 
     // Filter locations within the radius
     const nearbyItems = item.filter(item => {

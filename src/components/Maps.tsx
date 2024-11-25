@@ -11,7 +11,7 @@ import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
 import {getDistance} from 'geolib'; // Import getDistance
-import item from './item.json';
+import item from '../data/item2.json';
 
 interface Location {
   latitude: number;

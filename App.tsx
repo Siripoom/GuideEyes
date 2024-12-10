@@ -27,7 +27,7 @@ export default () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
   useEffect(() => {
     Tts.setDefaultLanguage('th-TH');
-    Tts.setDefaultRate(0.5); // ความเร็วในการอ่านออกเสียง (0.5 = ปกติ)
+    Tts.setDefaultRate(0.5);
 
     const onTtsFinish = () => {
       setIsShowSplash(false);
@@ -41,11 +41,11 @@ export default () => {
       );
     };
 
-    setTimeout(speakMessage, 1500);
+    setTimeout(speakMessage, 500);
 
     return () => {
-      Tts.removeEventListener('tts-finish', onTtsFinish); // ลบ listener เมื่อ component ถูกทำลาย
-      Tts.stop(); // หยุด TTS เมื่อ component ถูกทำลาย
+      Tts.removeEventListener('tts-finish', onTtsFinish);
+      Tts.stop();
     };
   }, []);
 
@@ -59,8 +59,7 @@ export default () => {
     <TamaguiProvider config={tamaguiConfig}>
       <TouchableWithoutFeedback
         onLongPress={handleLongPress}
-        delayLongPress={500} // Adjust the delay for long press (default is 500ms)
-      >
+        delayLongPress={300}>
         <View style={styles.container}>
           {isShowSplash ? <SplashScreen /> : <SpeechScreen />}
           {/* {!isShowSplash && <Maps />} */}

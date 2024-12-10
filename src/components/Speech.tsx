@@ -15,7 +15,7 @@ import Maps from './Maps';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState(false);
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<string>(''); // Use a single result for simplicity
   const [showMaps, setShowMaps] = useState(false); // State to control Maps functionality
 
   const requestMicrophonePermission = async () => {
@@ -33,10 +33,8 @@ export const Speech: React.FC = () => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('การอนุญาตใช้ไมโครโฟนได้รับการอนุมัติ');
-          Tts.speak('การอนุญาตใช้ไมโครโฟนได้รับการอนุมัติ');
         } else {
           console.log('การอนุญาตใช้ไมโครโฟนถูกปฏิเสธ');
-          Tts.speak('การอนุญาตใช้ไมโครโฟนถูกปฏิเสธ');
         }
       } catch (err) {
         console.warn(err);
@@ -45,7 +43,7 @@ export const Speech: React.FC = () => {
   };
 
   const startRecognition = async () => {
-    setResults([]);
+    setResults(''); // Clear previous result
     try {
       await Voice.start('th-TH', {
         RECOGNIZER_ENGINE: 'services',
@@ -64,8 +62,11 @@ export const Speech: React.FC = () => {
 
     // Set up Voice events
     Voice.onSpeechResults = (e: any) => {
-      setResults(e.value);
-      handleSpeechResults(e.value);
+      const firstResult = e.value && e.value[0]; // Always pick the first result
+      if (firstResult) {
+        setResults(firstResult);
+        handleSpeechResult(firstResult);
+      }
     };
     Voice.onSpeechEnd = () => {
       stopRecognition(); // Automatically stop when speech ends
@@ -88,54 +89,57 @@ export const Speech: React.FC = () => {
     }
   };
 
-  const handleSpeechResults = (results: string[]) => {
-    results.forEach(result => {
-      switch (result) {
-        case 'ป้ายรถ':
-          setShowMaps(true); // Enable Maps functionality
-          break;
-        case 'นำทาง':
-          Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
-          break;
-        case 'เปิดกล้อง':
-          Alert.alert('เปิดกล้องเรียบร้อย');
-          Tts.speak('เปิดกล้องเรียบร้อย');
-          break;
-        case 'ยกเลิก':
-          Tts.stop();
-          break;
-        default:
-          Tts.speak('ไม่ตรงกับคำสั่งที่กำหนด');
-          break;
-      }
-    });
+  console.log(results);
+
+  const handleSpeechResult = (result: string) => {
+    switch (result) {
+      case 'ป้ายรถ':
+        setShowMaps(true); // Enable Maps functionality
+        break;
+      case 'นำทาง':
+        Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
+        break;
+      case 'เปิดกล้อง':
+        Alert.alert('เปิดกล้องเรียบร้อย');
+        Tts.speak('เปิดกล้องเรียบร้อย');
+        break;
+      case 'ยกเลิก':
+        setShowMaps(false);
+        Tts.speak('ทำการยกเลิก');
+        Tts.stop;
+        break;
+      default:
+        Tts.speak('ไม่ตรงกับคำสั่งที่กำหนด');
+        break;
+    }
   };
 
   return (
-    <View style={styles.mainView}>
+    <View style={{flex: 1}}>
       {showMaps && <Maps />}
-      <Button
-        icon={Mic}
-        alignSelf="center"
-        style={{
-          backgroundColor: isRecognizing ? 'red' : 'green',
-          width: 300,
-          height: 300,
-          borderRadius: 200,
-          marginBottom: 10,
-        }}
-        size="$10"
-        color={'white'}
-        onPress={startRecognition}
-        disabled={isRecognizing}>
-        {/* Button starts recognition */}
-      </Button>
 
-      {/* Show recognition results */}
-      <View style={styles.results}>
-        {results.map((result, index) => (
-          <Text key={index}>{result}</Text>
-        ))}
+      <View style={styles.mainView}>
+        <Button
+          icon={Mic}
+          scaleIcon={10}
+          alignSelf="center"
+          style={{
+            backgroundColor: isRecognizing ? 'red' : 'green',
+            width: 300,
+            height: 300,
+            borderRadius: 200,
+            marginBottom: 10,
+          }}
+          size="$6"
+          color={'white'}
+          onPress={startRecognition}>
+          {/* Button starts recognition */}
+        </Button>
+
+        {/* Show recognition result */}
+        <View style={styles.results}>
+          <Text>{results}</Text>
+        </View>
       </View>
     </View>
   );

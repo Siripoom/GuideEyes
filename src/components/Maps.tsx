@@ -13,6 +13,7 @@ import Tts from 'react-native-tts';
 import {getDistance} from 'geolib'; // Import getDistance
 import item from '../data/item2.json';
 
+
 interface Location {
   latitude: number;
   longitude: number;
@@ -82,7 +83,7 @@ const Maps = () => {
     Tts.speak('กำลังค้นหา'); // Start feedback
 
     // Define the search radius (e.g., 1 km)
-    const SEARCH_RADIUS = 1000; // in meters
+    const SEARCH_RADIUS = 500; // in meters
 
     // Filter locations within the radius
     const nearbyItems = item.filter(item => {

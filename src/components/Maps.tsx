@@ -13,7 +13,6 @@ import Tts from 'react-native-tts';
 import {getDistance} from 'geolib'; // Import getDistance
 import item from '../data/item2.json';
 
-
 interface Location {
   latitude: number;
   longitude: number;
@@ -98,7 +97,15 @@ const Maps = () => {
       // If items are found, speak their names
       Tts.speak(`ค้นหาเจอแล้ว ${nearbyItems.length} รายการ`);
       nearbyItems.forEach(item => {
-        Tts.speak(item.name); // Speak the title of each nearby marker
+        const distance = getDistance(
+          {latitude: currentLat, longitude: currentLon},
+          {latitude: item.latitude, longitude: item.longitude},
+        );
+        const distanceKM =
+          distance > 1000
+            ? `${(distance / 1000).toFixed(2)} กิโลเมตร`
+            : `${distance} เมตร`;
+        Tts.speak(`${item.name} อยู่ห่าง ${distanceKM}`);
       });
     } else {
       Tts.speak('ไม่พบรายการใกล้เคียง');

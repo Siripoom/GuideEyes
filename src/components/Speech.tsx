@@ -12,11 +12,16 @@ import {Button} from 'tamagui';
 import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 import Maps from './Maps';
+import item from '../data/item.json';
+import MapNavigate from './Map_Navigate';
 
 export const Speech: React.FC = () => {
-  const [isRecognizing, setIsRecognizing] = useState(false);
+  const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
   const [results, setResults] = useState<string>(''); // Use a single result for simplicity
-  const [showMaps, setShowMaps] = useState(false); // State to control Maps functionality
+  const [showMaps, setShowMaps] = useState<boolean>(false); // State to control Maps functionality
+  const [showMapNavigate, setShowMapsNavigate] = useState<boolean>(false);
+  const [isNavigating, setIsNavigating] = useState<boolean>(false); // สถานะการรอชื่อ item
+  const [destinationItem, setDestinationItem] = useState<any>(null);
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -96,27 +101,41 @@ export const Speech: React.FC = () => {
       case 'ป้ายรถ':
         setShowMaps(true); // Enable Maps functionality
         break;
-      case 'นำทาง':
-        Alert.alert('เดินทางไปรถเมล์ที่ใกล้ที่สุด');
-        break;
       case 'เปิดกล้อง':
         Alert.alert('เปิดกล้องเรียบร้อย');
         Tts.speak('เปิดกล้องเรียบร้อย');
+        break;
+      case 'นำทาง':
+        Tts.speak('กรุณาพูดชื่อสถานที่ที่ต้องการไป');
+        setIsNavigating(true);
+        if (isNavigating) {
+          // ถ้าในขณะที่กำลังรอชื่อ item
+          const foundItem = item.find(i => i.name === result); // ค้นหาว่าผู้ใช้พูดชื่อ item อะไร
+
+          if (foundItem) {
+            Tts.speak(`นำทางไปที่ ${foundItem}`); // พูดชื่อของ item
+            setShowMapsNavigate(true); // แสดงแผนที่
+            setDestinationItem(foundItem); // ส่ง item ไปที่ Maps
+            setIsNavigating(false); // เสร็จสิ้นการรอ
+          } else {
+            Tts.speak('ไม่พบชื่อรายการที่ตรงกับคำที่คุณพูด');
+          }
+        }
         break;
       case 'ยกเลิก':
         setShowMaps(false);
         Tts.speak('ทำการยกเลิก');
         Tts.stop;
         break;
-      default:
-        Tts.speak('ไม่ตรงกับคำสั่งที่กำหนด');
-        break;
     }
   };
+
+  console.log('Test ' + destinationItem);
 
   return (
     <View style={{flex: 1}}>
       {showMaps && <Maps />}
+      {showMapNavigate && <MapNavigate destinationItem={destinationItem} />}
 
       <View style={styles.mainView}>
         <Button

@@ -21,7 +21,7 @@ export const Speech: React.FC = () => {
   const [showMaps, setShowMaps] = useState<boolean>(false); // State to control Maps functionality
   const [showMapNavigate, setShowMapsNavigate] = useState<boolean>(false);
   const [isNavigating, setIsNavigating] = useState<boolean>(false); // สถานะการรอชื่อ item
-  const [destinationItem, setDestinationItem] = useState<any>(null);
+  const [destinationItem, setDestinationItem] = useState<any>({});
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -107,20 +107,23 @@ export const Speech: React.FC = () => {
         break;
       case 'นำทาง':
         Tts.speak('กรุณาพูดชื่อสถานที่ที่ต้องการไป');
-        setIsNavigating(true);
-        if (isNavigating) {
-          // ถ้าในขณะที่กำลังรอชื่อ item
-          const foundItem = item.find(i => i.name === result); // ค้นหาว่าผู้ใช้พูดชื่อ item อะไร
+        const foundItem = item.find(i => i.name === 'วัดดอนเมือง');
+        setDestinationItem(foundItem);
+        setShowMapsNavigate(true);
+        // setIsNavigating(true);
+        // if (isNavigating) {
+        //   // ถ้าในขณะที่กำลังรอชื่อ item
+        //   const foundItem = item.find(i => i.name === result); // ค้นหาว่าผู้ใช้พูดชื่อ item อะไร
 
-          if (foundItem) {
-            Tts.speak(`นำทางไปที่ ${foundItem}`); // พูดชื่อของ item
-            setShowMapsNavigate(true); // แสดงแผนที่
-            setDestinationItem(foundItem); // ส่ง item ไปที่ Maps
-            setIsNavigating(false); // เสร็จสิ้นการรอ
-          } else {
-            Tts.speak('ไม่พบชื่อรายการที่ตรงกับคำที่คุณพูด');
-          }
-        }
+        //   if (foundItem) {
+        //     Tts.speak(`นำทางไปที่ ${foundItem}`); // พูดชื่อของ item
+        //     setShowMapsNavigate(true); // แสดงแผนที่
+        //     setDestinationItem(foundItem); // ส่ง item ไปที่ Maps
+        //     setIsNavigating(false); // เสร็จสิ้นการรอ
+        //   } else {
+        //     Tts.speak('ไม่พบชื่อรายการที่ตรงกับคำที่คุณพูด');
+        //   }
+        // }
         break;
       case 'ยกเลิก':
         setShowMaps(false);
@@ -130,7 +133,7 @@ export const Speech: React.FC = () => {
     }
   };
 
-  console.log('Test ' + destinationItem);
+  console.log('Test item ' + destinationItem);
 
   return (
     <View style={{flex: 1}}>

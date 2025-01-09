@@ -25,6 +25,7 @@ interface Location {
 const MapNavigate = ({destinationItem}: {destinationItem: any}) => {
   const [location, setLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testlog, setTestlog] = useState<any>({});
 
   const requestLocationPermission = async (): Promise<boolean> => {
     try {
@@ -66,6 +67,7 @@ const MapNavigate = ({destinationItem}: {destinationItem: any}) => {
         });
         setLoading(false);
         // startSearch(latitude, longitude); // Start searching once location is retrieved
+        getDirections(latitude, longitude, destinationItem);
       },
       error => {
         console.error('Geolocation error:', error);
@@ -119,29 +121,38 @@ const MapNavigate = ({destinationItem}: {destinationItem: any}) => {
     startLon: number,
     destination: any,
   ) => {
-    const apiKey = ''; // ใช้ API key ของคุณ
-    const url = `https://api.openrouteservice.org/v2/directions/walking?api_key=${apiKey}`;
+    console.log('เริ่มนำทาง');
+
+    const apiKey = '5b3ce3597851110001cf62480b711c833dee4b0581aed47829479246'; // ใช้ API key ของคุณ
+    const url = `https://api.openrouteservice.org/v2/directions/foot-walking`;
+
     const body = {
       coordinates: [
         [startLon, startLat], // ตำแหน่งปัจจุบัน
         [destination.longitude, destination.latitude], // ตำแหน่งจุดหมาย
       ],
-      profile: 'foot-walking',
-      format: 'geojson',
     };
+
+    setTestlog(body);
 
     // แจ้งขั้นตอนแรก - กำลังขอข้อมูลจาก API
     Tts.speak('กำลังขอข้อมูลจากเซิร์ฟเวอร์เพื่อคำนวณเส้นทาง');
 
     try {
-      // เริ่มดึงข้อมูลจาก API
-      const response = await axios.post(url, body);
+      // ส่งคำขอไปยัง API
+      const response = await axios.post(url, body, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
       const directionsData = response.data;
 
       // แจ้งว่าข้อมูลถูกดึงมาแล้ว
       Tts.speak('ข้อมูลเส้นทางถูกดึงมาแล้ว กำลังคำนวณเส้นทาง');
 
-      // ดำเนินการกับข้อมูลการเดินทาง
+      // ใช้ข้อมูลการเดินทางที่ได้
       directionsData.features[0].properties.segments[0].steps.forEach(
         (step: any) => {
           const instruction = step.instruction;
@@ -151,11 +162,17 @@ const MapNavigate = ({destinationItem}: {destinationItem: any}) => {
 
       // แจ้งว่าการคำนวณเส้นทางเสร็จสมบูรณ์
       Tts.speak('เส้นทางคำนวณเสร็จสมบูรณ์');
-    } catch (error) {
-      console.error('Error fetching directions:', error);
+    } catch (error: any) {
+      console.error(
+        'Error fetching directions:',
+        error?.response?.data || error,
+      );
       Tts.speak('ไม่สามารถดึงข้อมูลการเดินทางได้');
     }
   };
+
+  console.log('Test body ' + testlog);
+
   useEffect(() => {
     getCurrentLocation();
   }, [destinationItem]);

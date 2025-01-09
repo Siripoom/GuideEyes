@@ -20,7 +20,7 @@ export const Speech: React.FC = () => {
   const [results, setResults] = useState<string>(''); // Use a single result for simplicity
   const [showMaps, setShowMaps] = useState<boolean>(false); // State to control Maps functionality
   const [showMapNavigate, setShowMapsNavigate] = useState<boolean>(false);
-  const [isNavigating, setIsNavigating] = useState<boolean>(false); // สถานะการรอชื่อ item
+  // const [isNavigating, setIsNavigating] = useState<boolean>(false); // สถานะการรอชื่อ item
   const [destinationItem, setDestinationItem] = useState<any>({});
 
   const requestMicrophonePermission = async () => {
@@ -107,13 +107,17 @@ export const Speech: React.FC = () => {
         break;
       case 'นำทาง':
         Tts.speak('กรุณาพูดชื่อสถานที่ที่ต้องการไป');
-        const foundItem = item.find(i => i.name === 'วัดดอนเมือง');
+        Voice.destroy();
+        const foundItem = item.find(
+          i => i.name === 'มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ',
+        );
         setDestinationItem(foundItem);
         setShowMapsNavigate(true);
         // setIsNavigating(true);
         // if (isNavigating) {
         //   // ถ้าในขณะที่กำลังรอชื่อ item
         //   const foundItem = item.find(i => i.name === result); // ค้นหาว่าผู้ใช้พูดชื่อ item อะไร
+        //   console.log('หาคำ ' + foundItem);
 
         //   if (foundItem) {
         //     Tts.speak(`นำทางไปที่ ${foundItem}`); // พูดชื่อของ item
@@ -132,7 +136,6 @@ export const Speech: React.FC = () => {
         break;
     }
   };
-
   console.log('Test item ' + destinationItem);
 
   return (

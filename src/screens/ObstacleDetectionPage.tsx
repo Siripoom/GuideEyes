@@ -4,7 +4,7 @@ import {View, StyleSheet} from 'react-native';
 // import ObstacleDetector from '../components/ObstacleDetector';
 
 const ObstacleDetectionPage = () => {
-  return <View style={styles.container}>{/* <ObstacleDetector /> */}</View>;
+  return <View style={styles.container}>{}</View>;
 };
 
 const styles = StyleSheet.create({

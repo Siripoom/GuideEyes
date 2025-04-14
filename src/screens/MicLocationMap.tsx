@@ -1,47 +1,45 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  PermissionsAndroid,
-  Platform,
   StyleSheet,
   Alert,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import {Button} from 'tamagui';
 import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
+import itemData from '../data/Bus_510.json';
 import {StackNavigationProp} from '@react-navigation/stack';
-// import { RootStackParamList } from '../navigations';
 
-export const Speech: React.FC = () => {
+const MicLocationMap: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
   const [results, setResults] = useState<string>('');
-  const navigation = useNavigation<StackNavigationProp<any>>(); // Specify your navigation type if you have it
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
-    const setupPermissionsAndTTS = async () => {
+    const setupPermissions = async () => {
       await requestMicrophonePermission();
       Tts.setDefaultLanguage('th-TH');
       Tts.setDefaultRate(0.5);
     };
 
-    setupPermissionsAndTTS();
+    setupPermissions();
 
-    // Event listeners for voice
     Voice.onSpeechResults = (e: any) => {
       const firstResult = e.value?.[0];
       if (firstResult) {
         setResults(firstResult);
-        handleCommands(firstResult.trim().toLowerCase());
+        checkDestination(firstResult.trim().toLowerCase());
       }
     };
 
     Voice.onSpeechEnd = stopRecognition;
 
     return () => {
-      Voice.removeAllListeners(); // Properly remove listeners
-      Voice.destroy(); // Cleanup listeners
+      Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
 
@@ -70,11 +68,9 @@ export const Speech: React.FC = () => {
   const startRecognition = async () => {
     setResults('');
     try {
-      await Voice.start('th-TH', {
-        RECOGNIZER_ENGINE: 'services',
-        EXTRA_PARTIAL_RESULTS: true,
-      });
+      await Voice.start('th-TH');
       setIsRecognizing(true);
+      Tts.speak('กรุณาพูดชื่อสถานที่');
     } catch (e) {
       console.error(e);
     }
@@ -89,28 +85,18 @@ export const Speech: React.FC = () => {
     }
   };
 
-  const handleCommands = (cleanedResult: string) => {
-    switch (cleanedResult) {
-      case 'ป้ายรถ':
-        navigation.navigate('Map');
-        break;
-      case 'นำทาง':
-        navigation.navigate('MicLocationMap');
-        break;
-      case 'ดูทาง':
-        // navigation.navigate('MicLocationMap');
-        Tts.speak('ดูทาง');
-        break;
-      case 'เลขสาย':
-        Tts.speak('เลขสาย');
-        break;
-      case 'ยกเลิก':
-        Tts.speak('ทำการยกเลิก');
-        Tts.stop();
-        navigation.navigate('MicController');
-        break;
-      default:
-        Tts.speak('คำสั่งไม่รู้จัก');
+  const checkDestination = (spokenText: string) => {
+    // เปลี่ยนให้ตรวจสอบคำค้นหาโดยไม่คำนึงถึงตัวพิมพ์ใหญ่/พิมพ์เล็ก
+    const matchedItem = itemData.find(
+      (place: any) => place.name.toLowerCase() === spokenText.toLowerCase(),
+    );
+
+    if (matchedItem) {
+      Tts.speak(`กำลังนำทางไปยัง ${matchedItem.name}`);
+      navigation.navigate('MapNavigation', {destination: matchedItem});
+    } else {
+      Tts.speak('ไม่พบสถานที่ กรุณาลองใหม่');
+      Alert.alert('แจ้งเตือน', 'ไม่พบสถานที่ กรุณาลองใหม่');
     }
   };
 
@@ -120,7 +106,7 @@ export const Speech: React.FC = () => {
         icon={<Mic size={100} color="white" />}
         style={{
           backgroundColor: isRecognizing ? 'red' : 'green',
-          width: 300,
+          width: 300, // ขนาดปุ่มใหญ่ขึ้น
           height: 300,
           borderRadius: 250,
           justifyContent: 'center',
@@ -128,7 +114,7 @@ export const Speech: React.FC = () => {
           marginTop: 150,
         }}
         color={'white'}
-        iconAfter={undefined}
+        iconAfter={undefined} // ไม่ต้องมี text
         onPress={startRecognition}
       />
     </View>
@@ -139,8 +125,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f2f2f2',
   },
 });
 
-export default Speech;
+export default MicLocationMap;

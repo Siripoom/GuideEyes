@@ -6,13 +6,14 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  Text,
 } from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
+// import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
 import {getDistance} from 'geolib'; // Import getDistance
-import item from '../data/item2.json';
-
+import item from '../data/Bus_510.json';
 
 interface Location {
   latitude: number;
@@ -79,30 +80,44 @@ const Maps = () => {
     );
   };
 
+  const [nearbyItems, setNearbyItems] = useState<
+    {name: string; latitude: number; longitude: number; distance: number}[]
+  >([]);
+
   const startSearch = (currentLat: number, currentLon: number) => {
-    Tts.speak('กำลังค้นหา'); // Start feedback
+    Tts.stop(); // หยุดเสียงที่ค้างไว้ก่อน
 
-    // Define the search radius (e.g., 1 km)
-    const SEARCH_RADIUS = 500; // in meters
+    const SEARCH_RADIUS = 1800;
 
-    // Filter locations within the radius
-    const nearbyItems = item.filter(item => {
-      const distance = getDistance(
-        {latitude: currentLat, longitude: currentLon},
-        {latitude: item.latitude, longitude: item.longitude},
-      );
-      return distance <= SEARCH_RADIUS;
-    });
+    const foundItems = item
+      .map(item => {
+        const distance = getDistance(
+          {latitude: currentLat, longitude: currentLon},
+          {latitude: item.latitude, longitude: item.longitude},
+        );
+        return {...item, distance};
+      })
+      .filter(item => item.distance <= SEARCH_RADIUS);
 
-    if (nearbyItems.length > 0) {
-      // If items are found, speak their names
-      Tts.speak(`ค้นหาเจอแล้ว ${nearbyItems.length} รายการ`);
-      nearbyItems.forEach(item => {
-        Tts.speak(item.name); // Speak the title of each nearby marker
+    if (foundItems.length > 0) {
+      Tts.speak(`ค้นหาเจอแล้ว ${foundItems.length} รายการ`);
+
+      // ลูปพูดแบบ async เพื่อให้พูดเรียงกัน
+      foundItems.forEach((item, index) => {
+        const distanceKM =
+          item.distance > 1000
+            ? `${(item.distance / 1000).toFixed(2)} กิโลเมตร`
+            : `${item.distance} เมตร`;
+
+        setTimeout(() => {
+          Tts.speak(`${item.name} อยู่ห่าง ${distanceKM}`);
+        }, 1000 * (index + 1)); // พูดทีละตัวทุกๆ 1 วินาที
       });
     } else {
       Tts.speak('ไม่พบรายการใกล้เคียง');
     }
+
+    setNearbyItems(foundItems); // ค่อยอัปเดต state ทีหลัง
   };
 
   useEffect(() => {
@@ -110,6 +125,7 @@ const Maps = () => {
   }, []);
 
   if (loading) {
+    Tts.speak('กำลังค้นหา');
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -118,25 +134,24 @@ const Maps = () => {
   }
 
   return (
-    <View style={{flex: 1}}>
-      <MapView
-        style={styles.map}
-        region={location || undefined}
-        showsUserLocation={true}
-        showsMyLocationButton={true}>
-        {location && <Marker coordinate={location} title="You are here" />}
-        {item.map((item, index) => (
-          <Marker
-            key={item.id}
-            coordinate={{
-              latitude: item.latitude,
-              longitude: item.longitude,
-            }}
-            title={item.name}
-          />
-        ))}
-      </MapView>
-    </View>
+    <ScrollView contentContainerStyle={{padding: 16}}>
+      {nearbyItems.length > 0 ? (
+        nearbyItems.map((item, index) => {
+          const distanceKM =
+            item.distance > 1000
+              ? `${(item.distance / 1000).toFixed(2)} กิโลเมตร`
+              : `${item.distance} เมตร`;
+          return (
+            <View key={index} style={styles.card}>
+              <Text style={styles.title}>{item.name}</Text>
+              <Text style={styles.distance}>ระยะห่าง: {distanceKM}</Text>
+            </View>
+          );
+        })
+      ) : (
+        <Text style={styles.noData}>ไม่พบสถานที่ใกล้เคียง</Text>
+      )}
+    </ScrollView>
   );
 };
 
@@ -148,6 +163,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  distance: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  noData: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'gray',
+    marginTop: 20,
   },
 });
 

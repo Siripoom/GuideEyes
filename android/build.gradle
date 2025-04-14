@@ -11,11 +11,13 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://www.jitpack.io' }  // ✅ เพิ่ม JitPack (สำคัญ)
+        maven { url 'https://repo1.maven.org/maven2' }  // ✅ เพิ่ม Maven Official
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
-        classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath("com.android.tools.build:gradle:7.4.1")
+        classpath("com.facebook.react:react-native-gradle-plugin:0.74.3")  // หรือเวอร์ชันที่ต้องการ
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
     }
 }
 

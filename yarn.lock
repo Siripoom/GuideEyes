@@ -4843,7 +4843,6 @@ __metadata:
     react-dom: ^18.3.1
     react-native: 0.74.3
     react-native-background-actions: ^4.0.1
-    react-native-camera: ^4.2.1
     react-native-config: ^1.5.3
     react-native-geolocation-service: ^5.3.1
     react-native-gesture-handler: ^2.24.0
@@ -10412,7 +10411,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10553,15 +10552,6 @@ __metadata:
   peerDependencies:
     react-native: ">=0.47.0"
   checksum: 101cf491a3d0f40abb1189238d6911f544a69cc14b13734dac485600a1cd013d2c452a75d13579a66104ad43e4998bb8b927b982d7ff5c6e0074329e2eae1738
-  languageName: node
-  linkType: hard
-
-"react-native-camera@npm:^4.2.1":
-  version: 4.2.1
-  resolution: "react-native-camera@npm:4.2.1"
-  dependencies:
-    prop-types: ^15.6.2
-  checksum: 0e84ce657774694d1cc49395c43a8f2caabc03df36aa77aacfb5c797ad8cfe0368f4807deccc54e82ff2b193e8c2d1ce7ad504eedf7a9fc4719b38e39958a804
   languageName: node
   linkType: hard
 

@@ -7,6 +7,9 @@ buildscript {
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.22"
         googlePlayServicesVersion = "21.0.1" //add this line
+
+        androidxCoreVersion = "1.12.0"
+        androidxCoreKtxVersion = "1.12.0"
     }
     repositories {
         google()

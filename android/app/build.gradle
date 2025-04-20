@@ -74,6 +74,12 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+    flavorDimensions "react-native-camera"
+    productFlavors {
+    general {
+      dimension "react-native-camera"
+    }
+
     namespace "com.guideeyes"
     defaultConfig {
         applicationId "com.guideeyes"

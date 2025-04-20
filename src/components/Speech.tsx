@@ -99,7 +99,9 @@ export const Speech: React.FC = () => {
         break;
       case 'ดูทาง':
         // navigation.navigate('MicLocationMap');
-        Tts.speak('ดูทาง');
+        // Tts.speak('ดูทาง');
+        navigation.navigate('ObstacleDetection');
+
         break;
       case 'เลขสาย':
         Tts.speak('เลขสาย');

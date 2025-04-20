@@ -13,7 +13,7 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
 import {getDistance} from 'geolib'; // Import getDistance
-import item from '../data/Bus_510.json';
+import item from '../data/Bus_97.json';
 
 interface Location {
   latitude: number;

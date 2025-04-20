@@ -11,7 +11,7 @@ import {Button} from 'tamagui';
 import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
-import itemData from '../data/Bus_510.json';
+import itemData from '../data/Bus_97.json';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 const MicLocationMap: React.FC = () => {

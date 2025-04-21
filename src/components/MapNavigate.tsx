@@ -81,7 +81,7 @@ const MapNavigation: React.FC = () => {
         error => console.error('📍 GPS Error:', error),
         {
           enableHighAccuracy: true,
-          distanceFilter: 1,
+          distanceFilter: 5,
           forceRequestLocation: true,
         },
       );
@@ -128,6 +128,7 @@ const MapNavigation: React.FC = () => {
       }
     });
 
+    // ตรวจสอบระยะทางถึงจุดหมาย
     const distToDestination = getDistance(
       {latitude: current.lat, longitude: current.lng},
       {latitude: destination.latitude, longitude: destination.longitude},
@@ -136,7 +137,6 @@ const MapNavigation: React.FC = () => {
     if (distToDestination < 15 && !destinationReached) {
       setDestinationReached(true);
       Tts.speak('ถึงปลายทางแล้ว');
-      setTimeout(() => Tts.speak('ถึงปลายทางแล้ว'), 3000);
     }
 
     if (distToDestination > 50 && spokenSteps.length > 0) {

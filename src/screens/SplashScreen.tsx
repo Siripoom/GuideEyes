@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
   GestureResponderEvent,
+  Image,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
@@ -54,7 +55,10 @@ const SplashScreen = () => {
       onLongPress={handleLongPress}
       delayLongPress={500}>
       <View style={styles.container}>
-        <Text style={styles.text}>GuideEyes</Text>
+        <Image
+          source={require('../assets/icons/logo.png')}
+          style={styles.logo}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -65,9 +69,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: '#96b2bc',
   },
   text: {color: 'white', fontSize: 18},
+  logo: {
+    width: 300,
+    height: 300,
+    resizeMode: 'contain',
+  },
 });
 
 export default SplashScreen;

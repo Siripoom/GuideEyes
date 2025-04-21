@@ -5,7 +5,7 @@ import MapScreen from '../components/Maps';
 import MapNavigate from '../components/MapNavigate';
 import {SpeechScreen} from '../screens/SpeechScreen';
 import MicLocationMap from '../screens/MicLocationMap';
-
+import ObstacleDetectionScreen from '../screens/ObstacleDetectionScreen';
 export type RootStackParamList = {
   Splash: undefined;
   Map: undefined;
@@ -33,6 +33,10 @@ const AppNavigation = () => {
       <Stack.Screen name="MapNavigation" component={MapNavigate} />
       <Stack.Screen name="MicController" component={SpeechScreen} />
       <Stack.Screen name="MicLocationMap" component={MicLocationMap} />
+      <Stack.Screen
+        name="ObstacleDetection"
+        component={ObstacleDetectionScreen}
+      />
     </Stack.Navigator>
   );
 };

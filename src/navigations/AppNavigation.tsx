@@ -26,7 +26,7 @@ const Stack = createStackNavigator();
 const AppNavigation = () => {
   return (
     <Stack.Navigator
-      initialRouteName="MicController"
+      initialRouteName="Splash"
       screenOptions={{headerShown: false}} // ไม่แสดง header
     >
       <Stack.Screen name="Splash" component={SplashScreen} />

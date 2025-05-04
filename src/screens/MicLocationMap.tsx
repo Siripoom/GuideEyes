@@ -5,6 +5,8 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import {Button} from 'tamagui';
@@ -13,6 +15,7 @@ import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
 import itemData from '../data/Bus_97.json';
 import {StackNavigationProp} from '@react-navigation/stack';
+import BackButton from '../components/backButton';
 
 const MicLocationMap: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
@@ -20,13 +23,13 @@ const MicLocationMap: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
-    const setupPermissions = async () => {
-      await requestMicrophonePermission();
+    const setup = async () => {
       Tts.setDefaultLanguage('th-TH');
       Tts.setDefaultRate(0.5);
+      Tts.speak('กดปุ่มกลางหน้าจอเพื่อพูดชื่อสถานที่ๆ ต้องการไป');
     };
 
-    setupPermissions();
+    setup();
 
     Voice.onSpeechResults = (e: any) => {
       const firstResult = e.value?.[0];
@@ -43,34 +46,11 @@ const MicLocationMap: React.FC = () => {
     };
   }, []);
 
-  const requestMicrophonePermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          {
-            title: 'ขออนุญาตใช้ไมโครโฟน',
-            message: 'แอปต้องการใช้ไมโครโฟนเพื่อรับรู้เสียงพูด',
-            buttonNeutral: 'ถามฉันทีหลัง',
-            buttonNegative: 'ยกเลิก',
-            buttonPositive: 'ตกลง',
-          },
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('การอนุญาตใช้ไมโครโฟนถูกปฏิเสธ');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-
   const startRecognition = async () => {
     setResults('');
     try {
       await Voice.start('th-TH');
       setIsRecognizing(true);
-      Tts.speak('กรุณาพูดชื่อสถานที่');
     } catch (e) {
       console.error(e);
     }
@@ -110,21 +90,21 @@ const MicLocationMap: React.FC = () => {
           height: 300,
           borderRadius: 250,
           justifyContent: 'center',
-          alignItems: 'center',
+          alignSelf: 'center',
           marginTop: 150,
         }}
         color={'white'}
         iconAfter={undefined} // ไม่ต้องมี text
         onPress={startRecognition}
       />
+      <BackButton />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
   },
 });
 

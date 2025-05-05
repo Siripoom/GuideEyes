@@ -22,6 +22,7 @@ export const Speech: React.FC = () => {
   useEffect(() => {
     const setupPermissionsAndTTS = async () => {
       await requestMicrophonePermission();
+      await requestLocationPermission();
       Tts.setDefaultLanguage('th-TH');
       Tts.setDefaultRate(0.5);
     };
@@ -67,6 +68,27 @@ export const Speech: React.FC = () => {
     }
   };
 
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message:
+              'This app needs to access your location to display it on the map.',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('การอนุญาตตำแหน่งถูกปฏิเสธ');
+        }
+      } catch (error) {
+        console.error('Permission error:', error);
+      }
+    }
+  };
+
   const startRecognition = async () => {
     setResults('');
     try {
@@ -95,12 +117,12 @@ export const Speech: React.FC = () => {
         navigation.navigate('Map');
         break;
       case 'นำทาง':
-        navigation.navigate('MicLocationMap');
+        navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
         // navigation.navigate('MicLocationMap');
         // Tts.speak('ดูทาง');
-        navigation.navigate('Camera');
+        navigation.replace('Camera');
 
         break;
       case 'เลขสาย':
@@ -109,7 +131,7 @@ export const Speech: React.FC = () => {
       case 'ยกเลิก':
         Tts.speak('ทำการยกเลิก');
         Tts.stop();
-        navigation.navigate('MicController');
+        navigation.replace('MicController');
         break;
       default:
         Tts.speak('คำสั่งไม่รู้จัก');

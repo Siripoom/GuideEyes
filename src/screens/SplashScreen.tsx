@@ -19,7 +19,9 @@ const SplashScreen = () => {
     Tts.setDefaultRate(0.5);
 
     const onTtsFinish = () => {
-      navigation.navigate('MicController');
+      if (navigation.isFocused()) {
+        navigation.navigate('MicController');
+      }
     };
 
     // เพิ่มการตรวจสอบ listener ก่อนที่จะเพิ่ม

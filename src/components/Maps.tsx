@@ -8,12 +8,16 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
+  TouchableOpacity,
 } from 'react-native';
-// import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
-import {getDistance} from 'geolib'; // Import getDistance
+import {getDistance} from 'geolib';
+import {useNavigation} from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
+
 import item from '../data/Bus_97.json';
+import BackButton from './backButton';
 
 interface Location {
   latitude: number;
@@ -22,39 +26,22 @@ interface Location {
   longitudeDelta: number;
 }
 
+type DestinationParam = {
+  latitude: number;
+  longitude: number;
+  name: string;
+};
+
 const Maps = () => {
   const [location, setLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(true);
+  const [nearbyItems, setNearbyItems] = useState<
+    {name: string; latitude: number; longitude: number; distance: number}[]
+  >([]);
 
-  const requestLocationPermission = async (): Promise<boolean> => {
-    try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Access Required',
-            message:
-              'This app needs to access your location to display it on the map.',
-            buttonPositive: 'OK',
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      }
-      return true; // iOS: Permissions are handled via Info.plist
-    } catch (error) {
-      console.error('Permission error:', error);
-      return false;
-    }
-  };
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   const getCurrentLocation = async () => {
-    const hasPermission = await requestLocationPermission();
-    if (!hasPermission) {
-      Alert.alert('Permission Denied', 'Location permission is required.');
-      setLoading(false);
-      return;
-    }
-
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
@@ -65,7 +52,7 @@ const Maps = () => {
           longitudeDelta: 0.0421,
         });
         setLoading(false);
-        startSearch(latitude, longitude); // Start searching once location is retrieved
+        startSearch(latitude, longitude);
       },
       error => {
         console.error('Geolocation error:', error);
@@ -80,14 +67,9 @@ const Maps = () => {
     );
   };
 
-  const [nearbyItems, setNearbyItems] = useState<
-    {name: string; latitude: number; longitude: number; distance: number}[]
-  >([]);
-
   const startSearch = (currentLat: number, currentLon: number) => {
-    Tts.stop(); // หยุดเสียงที่ค้างไว้ก่อน
-
-    const SEARCH_RADIUS = 1800;
+    Tts.stop();
+    const SEARCH_RADIUS = 300;
 
     const foundItems = item
       .map(item => {
@@ -101,8 +83,6 @@ const Maps = () => {
 
     if (foundItems.length > 0) {
       Tts.speak(`ค้นหาเจอแล้ว ${foundItems.length} รายการ`);
-
-      // ลูปพูดแบบ async เพื่อให้พูดเรียงกัน
       foundItems.forEach((item, index) => {
         const distanceKM =
           item.distance > 1000
@@ -111,18 +91,25 @@ const Maps = () => {
 
         setTimeout(() => {
           Tts.speak(`${item.name} อยู่ห่าง ${distanceKM}`);
-        }, 1000 * (index + 1)); // พูดทีละตัวทุกๆ 1 วินาที
+        }, 1000 * (index + 1));
       });
     } else {
       Tts.speak('ไม่พบรายการใกล้เคียง');
     }
 
-    setNearbyItems(foundItems); // ค่อยอัปเดต state ทีหลัง
+    setNearbyItems(foundItems);
   };
 
   useEffect(() => {
     getCurrentLocation();
   }, []);
+
+  const handleNavigate = (destination: DestinationParam) => {
+    Tts.stop();
+    Tts.speak(`คุณเลือกไปยัง ${destination.name}`);
+    const finalLocation = destination;
+    navigation.navigate('MapNavigation', {destination: finalLocation});
+  };
 
   if (loading) {
     Tts.speak('กำลังค้นหา');
@@ -134,31 +121,45 @@ const Maps = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{padding: 16}}>
-      {nearbyItems.length > 0 ? (
-        nearbyItems.map((item, index) => {
-          const distanceKM =
-            item.distance > 1000
-              ? `${(item.distance / 1000).toFixed(2)} กิโลเมตร`
-              : `${item.distance} เมตร`;
-          return (
-            <View key={index} style={styles.card}>
-              <Text style={styles.title}>{item.name}</Text>
-              <Text style={styles.distance}>ระยะห่าง: {distanceKM}</Text>
-            </View>
-          );
-        })
-      ) : (
-        <Text style={styles.noData}>ไม่พบสถานที่ใกล้เคียง</Text>
-      )}
-    </ScrollView>
+    <View style={{flex: 1}}>
+      <ScrollView contentContainerStyle={{padding: 16, paddingBottom: 200}}>
+        {nearbyItems.length > 0 ? (
+          nearbyItems.map((item, index) => {
+            const distanceKM =
+              item.distance > 1000
+                ? `${(item.distance / 1000).toFixed(2)} กิโลเมตร`
+                : `${item.distance} เมตร`;
+
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.card}
+                onPress={() =>
+                  handleNavigate({
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    name: item.name,
+                  })
+                }>
+                <Text style={styles.title}>{item.name}</Text>
+                <Text style={styles.distance}>ระยะห่าง: {distanceKM}</Text>
+              </TouchableOpacity>
+            );
+          })
+        ) : (
+          <TouchableOpacity
+            style={styles.cardNoData}
+            onPress={() => getCurrentLocation()}>
+            <Text style={styles.noData}>กดปุ่มเพื่อค้นหาใหม่</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+      <BackButton />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -185,11 +186,22 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
+  cardNoData: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 40,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   noData: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 25,
     color: 'gray',
-    marginTop: 20,
+    marginTop: 10,
   },
 });
 

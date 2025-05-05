@@ -3,7 +3,6 @@ import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import {
   Camera,
   useCameraDevice,
-  useCameraDevices,
   useCameraPermission,
 } from 'react-native-vision-camera';
 import {useIsFocused} from '@react-navigation/native';

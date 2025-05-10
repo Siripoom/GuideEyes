@@ -16,7 +16,7 @@ const SplashScreen = () => {
 
   useEffect(() => {
     Tts.setDefaultLanguage('th-TH');
-    Tts.setDefaultRate(0.5);
+    Tts.setDefaultRate(0.7);
 
     const onTtsFinish = () => {
       if (navigation.isFocused()) {
@@ -29,7 +29,7 @@ const SplashScreen = () => {
 
     const speakMessage = () => {
       Tts.speak(
-        'ยินดีต้อนรับสู่แอพ GuideEyes แนะนำวิธีการใช้งานเบื้องต้น ' +
+        'ยินดีต้อนรับสู่แอพ Guide Eyes แนะนำวิธีการใช้งานเบื้องต้น ' +
           'การใช้งานมี 4 รูปแบบ ดังนี้ ' +
           '1. คำสั่งป้ายรถ จะค้นหาป้ายรถเมล์ที่ใกล้ที่สุดให้คุณ ' +
           '2. คำสั่งนำทาง แอพจะบอกการเดินทางไปป้ายรถเมล์ที่ใกล้ที่สุดให้คุณ ' +

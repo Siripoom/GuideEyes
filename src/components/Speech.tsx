@@ -1,3 +1,4 @@
+// src/components/Speech.tsx
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -12,12 +13,11 @@ import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-// import { RootStackParamList } from '../navigations';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
   const [results, setResults] = useState<string>('');
-  const navigation = useNavigation<StackNavigationProp<any>>(); // Specify your navigation type if you have it
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   useEffect(() => {
     const setupPermissionsAndTTS = async () => {
@@ -41,8 +41,8 @@ export const Speech: React.FC = () => {
     Voice.onSpeechEnd = stopRecognition;
 
     return () => {
-      Voice.removeAllListeners(); // Properly remove listeners
-      Voice.destroy(); // Cleanup listeners
+      Voice.removeAllListeners();
+      Voice.destroy();
     };
   }, []);
 
@@ -120,13 +120,15 @@ export const Speech: React.FC = () => {
         navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
-        // navigation.navigate('MicLocationMap');
-        // Tts.speak('ดูทาง');
-        navigation.replace('Camera');
-
+        // โหมดตรวจจับสิ่งกีดขวาง
+        navigation.replace('Camera', {mode: 'obstacle'});
         break;
       case 'เลขสาย':
-        Tts.speak('เลขสาย');
+        // โหมดจดจำรถเมล์
+        navigation.replace('Camera', {mode: 'bus'});
+        break;
+      case 'ทดสอบ':
+        navigation.navigate('TestOllama');
         break;
       case 'ยกเลิก':
         Tts.speak('ทำการยกเลิก');

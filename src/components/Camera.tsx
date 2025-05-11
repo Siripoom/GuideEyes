@@ -1,4 +1,4 @@
-// Camera.tsx
+// src/components/Camera.tsx
 import React, {useRef, useState, useEffect} from 'react';
 import {
   View,
@@ -13,11 +13,13 @@ import {
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Tts from 'react-native-tts';
 import axios from 'axios';
 import Config from 'react-native-config';
+import BusRecognitionService from '../services/BusRecognition';
+import Geolocation from 'react-native-geolocation-service';
 
 // ใช้ API Key จาก .env file
 const GOOGLE_VISION_API_KEY =
@@ -29,25 +31,35 @@ const CameraComponent = () => {
   const camera = useRef<Camera>(null);
   const isFocused = useIsFocused();
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const route = useRoute();
+
+  // ตรวจสอบ mode จาก route params
+  const mode = (route.params as any)?.mode || 'obstacle';
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   useEffect(() => {
     setupCamera();
     setupTTS();
+    getCurrentLocation();
   }, []);
 
   useEffect(() => {
-    // ตรวจจับอัตโนมัติทุก 5 วินาที
-    if (isReady && isFocused) {
+    // ตรวจจับอัตโนมัติทุก 5 วินาที เฉพาะโหมด obstacle
+    if (isReady && isFocused && mode === 'obstacle') {
       const interval = setInterval(() => {
         detectObject();
       }, 5000);
 
       return () => clearInterval(interval);
     }
-  }, [isReady, isFocused]);
+  }, [isReady, isFocused, mode]);
 
   const setupCamera = async () => {
     try {
@@ -72,9 +84,40 @@ const CameraComponent = () => {
     try {
       Tts.setDefaultLanguage('th-TH');
       Tts.setDefaultRate(0.7);
-      Tts.speak('กล้องพร้อมตรวจจับสิ่งกีดขวาง');
+
+      const initialMessage =
+        mode === 'bus'
+          ? 'กล้องพร้อมสำหรับการจดจำรถเมล์ กดปุ่มเพื่อถ่ายรูป'
+          : 'กล้องพร้อมตรวจจับสิ่งกีดขวาง';
+
+      Tts.speak(initialMessage);
     } catch (err) {
       console.error('TTS setup error:', err);
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    try {
+      Geolocation.getCurrentPosition(
+        position => {
+          setCurrentLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        error => {
+          console.error('Location error:', error);
+          // ค่าเริ่มต้น (กรุงเทพ)
+          setCurrentLocation({lat: 13.7563, lng: 100.5018});
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+        },
+      );
+    } catch (err) {
+      console.error('Failed to get location:', err);
     }
   };
 
@@ -83,12 +126,18 @@ const CameraComponent = () => {
 
     try {
       setIsProcessing(true);
-      Tts.speak('กำลังตรวจจับ');
+
+      if (mode === 'bus') {
+        Tts.speak('กำลังถ่ายรูปรถเมล์');
+      } else {
+        Tts.speak('กำลังตรวจจับ');
+      }
 
       // ถ่ายรูป
       const photo = await camera.current.takePhoto({
         flash: 'off',
         enableShutterSound: false,
+       
       });
 
       // แปลงรูปเป็น base64
@@ -104,6 +153,64 @@ const CameraComponent = () => {
         reader.readAsDataURL(blob);
       });
 
+      if (mode === 'bus') {
+        // โหมดจดจำรถเมล์
+        await handleBusRecognition(base64);
+      } else {
+        // โหมดตรวจจับสิ่งกีดขวาง
+        await handleObstacleDetection(base64);
+      }
+    } catch (error) {
+      console.error('Detection error:', error);
+      Tts.speak('ไม่สามารถตรวจจับได้ กรุณาลองใหม่');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // ฟังก์ชันจดจำรถเมล์
+  const handleBusRecognition = async (base64: string) => {
+    try {
+      const result = await BusRecognitionService.recognizeBus(
+        base64,
+        currentLocation || undefined,
+      );
+
+      if (result.recognized && result.busInfo) {
+        const busInfo = result.busInfo;
+        let message = `พบรถเมล์สาย ${
+          busInfo.lineNumber
+        } สี${busInfo.colors.join('และ')}`;
+
+        // เพิ่มข้อมูลเส้นทาง
+        message += ` วิ่งจาก ${busInfo.route.start} ถึง ${busInfo.route.end}`;
+
+        // เพิ่มระดับความมั่นใจ
+        const confidencePercent = Math.round(result.confidence * 100);
+        message += ` ความมั่นใจ ${confidencePercent} เปอร์เซ็นต์`;
+
+        Tts.speak(message);
+
+        // แสดงข้อมูลเพิ่มเติมถ้าผู้ใช้กดถาม
+        setTimeout(() => {
+          if (busInfo.route.via && busInfo.route.via.length > 0) {
+            Tts.speak(`ผ่าน ${busInfo.route.via.join(' ')}`);
+          }
+        }, 3000);
+      } else {
+        Tts.speak(
+          result.message || 'ไม่พบรถเมล์ในภาพ หรือไม่สามารถระบุหมายเลขได้',
+        );
+      }
+    } catch (error) {
+      console.error('Bus recognition error:', error);
+      Tts.speak('เกิดข้อผิดพลาดในการจดจำรถเมล์');
+    }
+  };
+
+  // ฟังก์ชันตรวจจับสิ่งกีดขวาง
+  const handleObstacleDetection = async (base64: string) => {
+    try {
       // เรียก Google Vision API
       const visionResponse = await axios.post(
         `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
@@ -128,10 +235,8 @@ const CameraComponent = () => {
 
       analyzeDetections(objects, labels);
     } catch (error) {
-      console.error('Detection error:', error);
-      Tts.speak('ไม่สามารถตรวจจับได้ กรุณาลองใหม่');
-    } finally {
-      setIsProcessing(false);
+      console.error('Vision API error:', error);
+      Tts.speak('ไม่สามารถตรวจจับวัตถุได้');
     }
   };
 
@@ -347,7 +452,11 @@ const CameraComponent = () => {
         onPress={detectObject}
         disabled={isProcessing}>
         <Text style={styles.detectButtonText}>
-          {isProcessing ? 'กำลังตรวจจับ...' : 'ตรวจจับ'}
+          {isProcessing
+            ? 'กำลังประมวลผล...'
+            : mode === 'bus'
+            ? 'ถ่ายรูปรถเมล์'
+            : 'ตรวจจับ'}
         </Text>
       </TouchableOpacity>
 

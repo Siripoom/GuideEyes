@@ -128,7 +128,7 @@ export const Speech: React.FC = () => {
         navigation.replace('Camera', {mode: 'bus'});
         break;
       case 'ทดสอบ':
-        navigation.navigate('TestOllama');
+        navigation.navigate('TestGoogleVision');
         break;
       case 'ยกเลิก':
         Tts.speak('ทำการยกเลิก');

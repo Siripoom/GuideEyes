@@ -1,3 +1,4 @@
+// src/screens/TestGoogleVision.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -9,7 +10,7 @@ import {
 import BusRecognitionService from '../services/BusRecognition';
 import Tts from 'react-native-tts';
 
-const TestOllama = () => {
+const TestGoogleVision = () => {
   const [status, setStatus] = useState<
     'idle' | 'testing' | 'success' | 'error'
   >('idle');
@@ -17,18 +18,18 @@ const TestOllama = () => {
 
   const testConnection = async () => {
     setStatus('testing');
-    setMessage('กำลังทดสอบการเชื่อมต่อ...');
+    setMessage('กำลังทดสอบการเชื่อมต่อ Google Vision API...');
 
     try {
-      const isConnected = await BusRecognitionService.testOllamaConnection();
+      const isConnected = await BusRecognitionService.testConnection();
 
       if (isConnected) {
         setStatus('success');
-        setMessage('เชื่อมต่อกับ Ollama สำเร็จ!');
+        setMessage('เชื่อมต่อกับ Google Vision API สำเร็จ!');
         Tts.speak('เชื่อมต่อกับระบบจดจำรถเมล์สำเร็จ');
       } else {
         setStatus('error');
-        setMessage('ไม่สามารถเชื่อมต่อกับ Ollama ได้');
+        setMessage('ไม่สามารถเชื่อมต่อกับ Google Vision API ได้');
         Tts.speak('ไม่สามารถเชื่อมต่อกับระบบได้');
       }
     } catch (error) {
@@ -153,4 +154,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TestOllama;
+export default TestGoogleVision;

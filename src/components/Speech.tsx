@@ -1,3 +1,4 @@
+// src/components/Speech.tsx
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -12,7 +13,6 @@ import {Mic} from '@tamagui/lucide-icons';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-// import { RootStackParamList } from '../navigations';
 
 export const Speech: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
@@ -119,15 +119,23 @@ export const Speech: React.FC = () => {
         navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
-        navigation.replace('Camera');
-        break;
+
+        
       case 'แผนที่': //**เอาไว้เช็คดูหมุดการเลี้ยวตอนเทส */
         // navigation.navigate('MicLocationMap');
         // Tts.speak('ดูทาง');
         navigation.replace('MapMaker');
+
+        // โหมดตรวจจับสิ่งกีดขวาง
+        navigation.replace('Camera', {mode: 'obstacle'});
+
         break;
       case 'เลขสาย':
-        Tts.speak('เลขสาย');
+        // โหมดจดจำรถเมล์
+        navigation.replace('Camera', {mode: 'bus'});
+        break;
+      case 'ทดสอบ':
+        navigation.navigate('TestGoogleVision');
         break;
       case 'ยกเลิก':
         Tts.speak('ทำการยกเลิก');

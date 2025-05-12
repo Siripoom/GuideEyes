@@ -15,7 +15,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import item from '../data/Bus_97.json';
-import BackButton from './BackButton';
+import BackButton from './backButton';
 
 interface Location {
   latitude: number;
@@ -67,7 +67,7 @@ const Maps = () => {
 
   const startSearch = (currentLat: number, currentLon: number) => {
     Tts.stop();
-    const SEARCH_RADIUS = 300;
+    const SEARCH_RADIUS = 3000;
 
     const foundItems = item
       .map(item => {

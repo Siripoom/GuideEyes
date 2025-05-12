@@ -6,13 +6,13 @@ import Tts from 'react-native-tts';
 import polyline from '@mapbox/polyline';
 import {getDistance} from 'geolib';
 import axios from 'axios';
-import BackButton from './BackButton';
+import BackButton from './backButton';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import type {RootStackParamList} from '../navigations/AppNavigation';
 
-const GOOGLE_API_KEY = '';
-const TRANSLATION_API_URL = '';
+const GOOGLE_API_KEY = 'AIzaSyDL24tbIFnNVaRsSZM9bpoN54NtyTKIj74';
+const TRANSLATION_API_URL = 'https://api.mymemory.translated.net/get';
 const PROXIMITY_THRESHOLD = 20;
 const DESTINATION_THRESHOLD = 10;
 // const OFF_ROUTE_THRESHOLD = 50;

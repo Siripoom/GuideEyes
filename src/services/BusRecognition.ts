@@ -21,7 +21,7 @@ interface Bus {
 
 class BusRecognitionService {
   private busDatabase: Bus[] = [];
-  private cache: Map<string, any> = new Map();
+  // private cache: Map<string, any> = new Map();
 
   constructor() {
     this.initializeDatabase();
@@ -153,12 +153,12 @@ class BusRecognitionService {
       console.log('Starting bus recognition with Google Vision API...');
       console.log('Image size:', imageBase64.length);
 
-      // ตรวจสอบ cache
-      const cacheKey = this.generateCacheKey(imageBase64);
-      const cachedResult = this.cache.get(cacheKey);
-      if (cachedResult) {
-        return cachedResult;
-      }
+      // ลบการตรวจสอบ cache นี้ออก
+      // const cacheKey = this.generateCacheKey(imageBase64);
+      // const cachedResult = this.cache.get(cacheKey);
+      // if (cachedResult) {
+      //   return cachedResult;
+      // }
 
       // เรียก Google Vision API
       const visionResult = await this.callGoogleVision(imageBase64);
@@ -166,8 +166,8 @@ class BusRecognitionService {
       // วิเคราะห์ผลลัพธ์
       const result = this.analyzeBusFromVision(visionResult);
 
-      // เก็บผลลัพธ์ใน cache
-      this.cache.set(cacheKey, result);
+      // ลบการเก็บผลลัพธ์ใน cache
+      // this.cache.set(cacheKey, result);
 
       return result;
     } catch (error) {
@@ -179,7 +179,6 @@ class BusRecognitionService {
       };
     }
   }
-
   // เรียก Google Vision API
   private async callGoogleVision(imageBase64: string) {
     try {

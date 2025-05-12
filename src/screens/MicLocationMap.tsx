@@ -15,7 +15,7 @@ import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
 import itemData from '../data/Bus_97.json';
 import {StackNavigationProp} from '@react-navigation/stack';
-import BackButton from '../components/BackButton';
+import BackButton from '../components/backButton';
 
 const MicLocationMap: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);

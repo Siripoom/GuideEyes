@@ -1,4 +1,3 @@
-// src/components/MapNavigation.tsx
 import React, {useEffect, useState, useRef} from 'react';
 import {View, StyleSheet, Alert} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
@@ -12,16 +11,15 @@ import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import type {RootStackParamList} from '../navigations/AppNavigation';
 
-type RoutePropType = RouteProp<RootStackParamList, 'MapNavigation'>;
-type NavPropType = StackNavigationProp<RootStackParamList, 'MapNavigation'>;
-
-const GOOGLE_API_KEY = '';
+const GOOGLE_API_KEY = 'AIzaSyDL24tbIFnNVaRsSZM9bpoN54NtyTKIj74';
 const PROXIMITY_THRESHOLD = 20;
 const DESTINATION_THRESHOLD = 15;
+const OFF_ROUTE_THRESHOLD = 50;
 
 export default function MapNavigation() {
-  const {params} = useRoute<RoutePropType>();
-  const navigation = useNavigation<NavPropType>();
+  const {params} = useRoute<RouteProp<RootStackParamList, 'MapNavigation'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, 'MapNavigation'>>();
   const {
     name: destName,
     latitude: destLat,
@@ -40,7 +38,7 @@ export default function MapNavigation() {
   const speakingRef = useRef(false);
   const watchIdRef = useRef<number | null>(null);
 
-  // ฟังก์ชันเรียก API แปลข้อความอังกฤษ→ไทย
+  // ฟังก์ชันแปลข้อความอังกฤษ→ไทย
   const translateTextViaAPI = async (text: string): Promise<string> => {
     try {
       const res = await axios.post(
@@ -49,7 +47,8 @@ export default function MapNavigation() {
         {headers: {'Content-Type': 'application/json'}},
       );
       return res.data.translatedText || text;
-    } catch {
+    } catch (e) {
+      console.error('Translation error:', e);
       return text;
     }
   };
@@ -79,7 +78,7 @@ export default function MapNavigation() {
       {
         enableHighAccuracy: true,
         distanceFilter: 5,
-        interval: 5000,
+        interval: 3000,
         fastestInterval: 2000,
       },
     );
@@ -135,7 +134,6 @@ export default function MapNavigation() {
 
   // ตรวจจุดเลี้ยว & ถึงปลายทาง
   const checkProximityAndArrival = async (cur: {lat: number; lng: number}) => {
-    // เลี้ยวก้าวต่อไป
     if (!speakingRef.current) {
       for (
         let i = lastSpokenIdxRef.current + 1;
@@ -156,22 +154,33 @@ export default function MapNavigation() {
         }
       }
     }
+
     // ถึงปลายทาง
-    if (!arrivalSpokenRef.current) {
-      const toDest = getDistance(
-        {latitude: cur.lat, longitude: cur.lng},
-        {latitude: destLat, longitude: destLng},
-      );
-      if (toDest < DESTINATION_THRESHOLD) {
-        arrivalSpokenRef.current = true;
-        speakingRef.current = true;
-        Tts.speak('ถึงปลายทางแล้ว');
-        setTimeout(async () => {
-          speakingRef.current = true;
-          Tts.speak('ถึงปลายทางแล้ว');
-          navigation.navigate('MicController');
-        }, 3000);
-      }
+    const toDest = getDistance(
+      {latitude: cur.lat, longitude: cur.lng},
+      {latitude: destLat, longitude: destLng},
+    );
+    if (toDest < DESTINATION_THRESHOLD && !arrivalSpokenRef.current) {
+      arrivalSpokenRef.current = true;
+      speakingRef.current = true;
+      Tts.speak('ถึงปลายทางแล้ว');
+      setTimeout(() => navigation.navigate('MicController'), 3000);
+    }
+
+    // ตรวจออกนอกเส้นทาง
+    const routeLineDistance = getDistance(
+      {latitude: cur.lat, longitude: cur.lng},
+      {
+        latitude: routePts[routePts.length - 1].latitude,
+        longitude: routePts[routePts.length - 1].longitude,
+      },
+    );
+    if (routeLineDistance > OFF_ROUTE_THRESHOLD) {
+      console.log('Recalculating route...');
+      stepsRef.current = [];
+      arrivalSpokenRef.current = false;
+      lastSpokenIdxRef.current = -1;
+      await fetchRouteAndSpeakFirst(cur);
     }
   };
 

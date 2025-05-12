@@ -16,7 +16,7 @@ import {getDistance} from 'geolib';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
-import item from '../data/Bus_97.json';
+import item from '../data/Bus_510.json';
 import BackButton from './backButton';
 
 interface Location {
@@ -69,7 +69,7 @@ const Maps = () => {
 
   const startSearch = (currentLat: number, currentLon: number) => {
     Tts.stop();
-    const SEARCH_RADIUS = 300;
+    const SEARCH_RADIUS = 3000;
 
     const foundItems = item
       .map(item => {
@@ -90,7 +90,7 @@ const Maps = () => {
             : `${item.distance} เมตร`;
 
         setTimeout(() => {
-          Tts.speak(`${item.name} อยู่ห่าง ${distanceKM}`);
+          Tts.speak(`${item.name} อยู่ห่าง ${`${distanceKM}`}`);
         }, 1000 * (index + 1));
       });
     } else {

@@ -67,7 +67,7 @@ const Maps = () => {
 
   const startSearch = (currentLat: number, currentLon: number) => {
     Tts.stop();
-    const SEARCH_RADIUS = 3000;
+    const SEARCH_RADIUS = 300;
 
     const foundItems = item
       .map(item => {

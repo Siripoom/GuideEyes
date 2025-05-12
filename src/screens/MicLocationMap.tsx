@@ -15,7 +15,7 @@ import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
 import itemData from '../data/Bus_97.json';
 import {StackNavigationProp} from '@react-navigation/stack';
-import BackButton from '../components/backButton';
+import BackButton from '../components/BackButton';
 
 const MicLocationMap: React.FC = () => {
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false);
@@ -73,10 +73,9 @@ const MicLocationMap: React.FC = () => {
 
     if (matchedItem) {
       Tts.speak(`กำลังนำทางไปยัง ${matchedItem.name}`);
-      navigation.navigate('MapNavigation', {destination: matchedItem});
+      navigation.replace('MapNavigation', {destination: matchedItem});
     } else {
       Tts.speak('ไม่พบสถานที่ กรุณาลองใหม่');
-      Alert.alert('แจ้งเตือน', 'ไม่พบสถานที่ กรุณาลองใหม่');
     }
   };
 

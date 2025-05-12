@@ -1,4 +1,3 @@
-// src/components/MapNavigation.tsx
 import React, {useEffect, useState, useRef} from 'react';
 import {View, StyleSheet, Alert} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
@@ -7,21 +6,21 @@ import Tts from 'react-native-tts';
 import polyline from '@mapbox/polyline';
 import {getDistance} from 'geolib';
 import axios from 'axios';
-import BackButton from './backButton';
+import BackButton from './BackButton';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import type {RootStackParamList} from '../navigations/AppNavigation';
 
-type RoutePropType = RouteProp<RootStackParamList, 'MapNavigation'>;
-type NavPropType = StackNavigationProp<RootStackParamList, 'MapNavigation'>;
-
 const GOOGLE_API_KEY = '';
+const TRANSLATION_API_URL = '';
 const PROXIMITY_THRESHOLD = 20;
-const DESTINATION_THRESHOLD = 15;
+const DESTINATION_THRESHOLD = 10;
+// const OFF_ROUTE_THRESHOLD = 50;
 
-export default function MapNavigation() {
-  const {params} = useRoute<RoutePropType>();
-  const navigation = useNavigation<NavPropType>();
+const MapNavigation: React.FC = () => {
+  const {params} = useRoute<RouteProp<RootStackParamList, 'MapNavigation'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, 'MapNavigation'>>();
   const {
     name: destName,
     latitude: destLat,
@@ -40,16 +39,18 @@ export default function MapNavigation() {
   const speakingRef = useRef(false);
   const watchIdRef = useRef<number | null>(null);
 
-  // ฟังก์ชันเรียก API แปลข้อความอังกฤษ→ไทย
+  // ฟังก์ชันแปลข้อความอังกฤษ→ไทย
   const translateTextViaAPI = async (text: string): Promise<string> => {
     try {
-      const res = await axios.post(
-        'https://libretranslate.com/translate',
-        {q: text, source: 'en', target: 'th', format: 'text'},
-        {headers: {'Content-Type': 'application/json'}},
-      );
-      return res.data.translatedText || text;
-    } catch {
+      const response = await axios.get(TRANSLATION_API_URL, {
+        params: {
+          q: text,
+          langpair: 'en|th',
+        },
+      });
+      return response.data.responseData.translatedText || text;
+    } catch (error) {
+      console.error('Translation error:', error);
       return text;
     }
   };
@@ -79,7 +80,7 @@ export default function MapNavigation() {
       {
         enableHighAccuracy: true,
         distanceFilter: 5,
-        interval: 5000,
+        interval: 3000,
         fastestInterval: 2000,
       },
     );
@@ -99,10 +100,23 @@ export default function MapNavigation() {
       await fetchRouteAndSpeakFirst(cur);
     } else {
       await checkProximityAndArrival(cur);
+      checkIfOffRoute(cur); //
     }
   };
 
-  // ดึงเส้นทาง + พูดก้าวแรก
+  const speakWithReset = async (text: string) => {
+    return new Promise<void>(resolve => {
+      speakingRef.current = true;
+      Tts.speak(text);
+      Tts.addEventListener('tts-finish', () => {
+        speakingRef.current = false;
+        Tts.removeAllListeners('tts-finish');
+        resolve();
+      });
+    });
+  };
+
+  // ฟังก์ชันดึงเส้นทาง + พูดก้าวแรก
   const fetchRouteAndSpeakFirst = async (origin: {
     lat: number;
     lng: number;
@@ -124,18 +138,23 @@ export default function MapNavigation() {
       setRoutePts(pts);
 
       const raw = leg.steps[0].html_instructions.replace(/<[^>]+>/g, '');
+      const translatedText = await translateTextViaAPI(raw);
+
       speakingRef.current = true;
-      Tts.speak(await translateTextViaAPI(raw));
-      lastSpokenIdxRef.current = 0;
+      Tts.speak(translatedText);
+
+      Tts.addEventListener('tts-finish', () => {
+        speakingRef.current = false;
+        lastSpokenIdxRef.current = 0;
+        Tts.removeAllListeners('tts-finish');
+      });
     } catch (e) {
       console.error('fetchRoute error', e);
       Alert.alert('ไม่สามารถดึงเส้นทางได้');
     }
   };
 
-  // ตรวจจุดเลี้ยว & ถึงปลายทาง
   const checkProximityAndArrival = async (cur: {lat: number; lng: number}) => {
-    // เลี้ยวก้าวต่อไป
     if (!speakingRef.current) {
       for (
         let i = lastSpokenIdxRef.current + 1;
@@ -147,33 +166,62 @@ export default function MapNavigation() {
           {latitude: cur.lat, longitude: cur.lng},
           {latitude: step.end_location.lat, longitude: step.end_location.lng},
         );
+
         if (dist < PROXIMITY_THRESHOLD) {
           const raw = step.html_instructions.replace(/<[^>]+>/g, '');
-          speakingRef.current = true;
-          Tts.speak(await translateTextViaAPI(raw));
+          const translatedText = await translateTextViaAPI(raw);
+
+          await speakWithReset(translatedText);
+
           lastSpokenIdxRef.current = i;
+
           break;
         }
       }
     }
-    // ถึงปลายทาง
-    if (!arrivalSpokenRef.current) {
-      const toDest = getDistance(
-        {latitude: cur.lat, longitude: cur.lng},
-        {latitude: destLat, longitude: destLng},
-      );
-      if (toDest < DESTINATION_THRESHOLD) {
-        arrivalSpokenRef.current = true;
-        speakingRef.current = true;
-        Tts.speak('ถึงปลายทางแล้ว');
-        setTimeout(async () => {
-          speakingRef.current = true;
-          Tts.speak('ถึงปลายทางแล้ว');
-          navigation.navigate('MicController');
-        }, 3000);
-      }
+
+    const toDest = getDistance(
+      {latitude: cur.lat, longitude: cur.lng},
+      {latitude: destLat, longitude: destLng},
+    );
+
+    if (toDest < DESTINATION_THRESHOLD && !arrivalSpokenRef.current) {
+      arrivalSpokenRef.current = true;
+      await speakWithReset('ถึงปลายทางแล้ว');
+      setTimeout(() => navigation.replace('MicController'), 3000);
     }
   };
+
+  const checkIfOffRoute = (() => {
+    let lastDistance = Infinity;
+    let lastCheckTime = Date.now();
+
+    return (current: {lat: number; lng: number}) => {
+      if (stepsRef.current.length === 0) return;
+
+      const nextStep = stepsRef.current[0];
+      const distanceToNext = getDistance(
+        {latitude: current.lat, longitude: current.lng},
+        {
+          latitude: nextStep.end_location.lat,
+          longitude: nextStep.end_location.lng,
+        },
+      );
+      const now = Date.now();
+      if (distanceToNext >= lastDistance && now - lastCheckTime > 300000) {
+        Tts.speak('คุณออกนอกเส้นทาง แอปกำลังดึงเส้นทางใหม่');
+        stepsRef.current = [];
+        arrivalSpokenRef.current = false;
+        lastSpokenIdxRef.current = -1;
+        fetchRouteAndSpeakFirst(current);
+        lastCheckTime = Date.now();
+        lastDistance = Infinity;
+      } else if (distanceToNext < lastDistance) {
+        lastDistance = distanceToNext;
+        lastCheckTime = now;
+      }
+    };
+  })();
 
   return (
     <View style={styles.container}>
@@ -204,9 +252,11 @@ export default function MapNavigation() {
       <BackButton />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {flex: 1},
   map: {flex: 1},
 });
+
+export default MapNavigation;

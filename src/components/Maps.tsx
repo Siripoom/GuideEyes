@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
-  PermissionsAndroid,
-  Platform,
   Alert,
   ActivityIndicator,
   ScrollView,
@@ -13,11 +11,11 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import Tts from 'react-native-tts';
 import {getDistance} from 'geolib';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 import item from '../data/Bus_97.json';
-import BackButton from './backButton';
+import BackButton from './BackButton';
 
 interface Location {
   latitude: number;
@@ -90,7 +88,7 @@ const Maps = () => {
             : `${item.distance} เมตร`;
 
         setTimeout(() => {
-          Tts.speak(`${item.name} อยู่ห่าง ${distanceKM}`);
+          Tts.speak(`${item.name} อยู่ห่าง ${`${distanceKM}`}`);
         }, 1000 * (index + 1));
       });
     } else {
@@ -108,8 +106,15 @@ const Maps = () => {
     Tts.stop();
     Tts.speak(`คุณเลือกไปยัง ${destination.name}`);
     const finalLocation = destination;
-    navigation.navigate('MapNavigation', {destination: finalLocation});
+    navigation.replace('MapNavigation', {destination: finalLocation});
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Stop TTS when entering or focusing this screen
+      Tts.stop();
+    }, []),
+  );
 
   if (loading) {
     Tts.speak('กำลังค้นหา');

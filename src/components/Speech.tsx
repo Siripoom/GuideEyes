@@ -29,7 +29,6 @@ export const Speech: React.FC = () => {
 
     setupPermissionsAndTTS();
 
-    // Event listeners for voice
     Voice.onSpeechResults = (e: any) => {
       const firstResult = e.value?.[0];
       if (firstResult) {
@@ -120,8 +119,16 @@ export const Speech: React.FC = () => {
         navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
+
+        
+      case 'แผนที่': //**เอาไว้เช็คดูหมุดการเลี้ยวตอนเทส */
+        // navigation.navigate('MicLocationMap');
+        // Tts.speak('ดูทาง');
+        navigation.replace('MapMaker');
+
         // โหมดตรวจจับสิ่งกีดขวาง
         navigation.replace('Camera', {mode: 'obstacle'});
+
         break;
       case 'เลขสาย':
         // โหมดจดจำรถเมล์

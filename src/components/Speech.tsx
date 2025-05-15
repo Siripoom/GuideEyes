@@ -24,7 +24,7 @@ export const Speech: React.FC = () => {
       await requestMicrophonePermission();
       await requestLocationPermission();
       Tts.setDefaultLanguage('th-TH');
-      Tts.setDefaultRate(0.5);
+      Tts.setDefaultRate(0.7);
     };
 
     setupPermissionsAndTTS();
@@ -119,16 +119,12 @@ export const Speech: React.FC = () => {
         navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
-
-        
+        navigation.replace('Camera', {mode: 'obstacle'});
+        break;
       case 'แผนที่': //**เอาไว้เช็คดูหมุดการเลี้ยวตอนเทส */
         // navigation.navigate('MicLocationMap');
         // Tts.speak('ดูทาง');
         navigation.replace('MapMaker');
-
-        // โหมดตรวจจับสิ่งกีดขวาง
-        navigation.replace('Camera', {mode: 'obstacle'});
-
         break;
       case 'เลขสาย':
         // โหมดจดจำรถเมล์

@@ -37,7 +37,7 @@
      android:name="com.google.android.geo.API_KEY"
 
      
-     android:value="AIzaSyDL24tbIFnNVaRsSZM9bpoN54NtyTKIj74"/> 
+     android:value=""/> 
      <service
       android:name="com.supersami.foregroundservice.ForegroundService"
       android:exported="false"

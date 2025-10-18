@@ -12,7 +12,6 @@ const BackButton: React.FC = () => {
     <TouchableOpacity
       style={styles.backButton}
       onPress={() => {
-        navigation.replace('MicController');
         Tts.stop();
         navigation.replace('MicController');
       }}>

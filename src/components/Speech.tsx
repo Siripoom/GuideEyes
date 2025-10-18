@@ -119,7 +119,8 @@ export const Speech: React.FC = () => {
         navigation.replace('MicLocationMap');
         break;
       case 'ดูทาง':
-        navigation.replace('Camera');
+        // โหมดตรวจจับสิ่งกีดขวาง
+        navigation.replace('Camera', {mode: 'obstacle'});
         break;
       case 'แผนที่': //**เอาไว้เช็คดูหมุดการเลี้ยวตอนเทส */
         // navigation.navigate('MicLocationMap');

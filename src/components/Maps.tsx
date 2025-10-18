@@ -100,6 +100,7 @@ const Maps = () => {
 
   useEffect(() => {
     getCurrentLocation();
+    Tts.setDefaultRate(0.7);
   }, []);
 
   const handleNavigate = (destination: DestinationParam) => {

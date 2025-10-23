@@ -200,44 +200,44 @@
   {
     "id": 34,
     "name": "ตรงข้ามกรมยุทธบริการ ขาออก",
-    "latitude": 13.8264811,
-    "longitude": 100.5305007
+    "latitude": 13.82653,
+    "longitude": 100.5304
   },
   {
     "id": 35,
     "name": "บิ๊กซีวงศ์สว่าง",
-    "latitude": 13.8269836,
-    "longitude": 100.5270772
+    "latitude": 13.82705,
+    "longitude": 100.5273
   },
   {
     "id": 36,
     "name": "ตรงข้ามวัดเลียบ",
     "latitude": 13.8246075,
-    "longitude": 100.52438
+    "longitude": 100.52458
   },
   {
     "id": 37,
     "name": "ตรงข้ามซอยวัดหลวง",
-    "latitude": 13.8234157,
-    "longitude": 100.5230052
+    "latitude": 13.82339,
+    "longitude": 100.52322
   },
   {
     "id": 38,
     "name": "ตรงข้ามวัดน้อย",
-    "latitude": 13.8218,
-    "longitude": 100.5215495
+    "latitude": 13.82178,
+    "longitude": 100.5215
   },
   {
     "id": 39,
     "name": "ซอยยิ้มประยูร",
-    "latitude": 13.82068,
+    "latitude": 13.82073,
     "longitude": 100.52036
   },
   {
     "id": 40,
     "name": "วัดเสาหิน",
-    "latitude": 13.81892,
-    "longitude": 100.518
+    "latitude": 13.81877,
+    "longitude": 100.51815
   },
   {
     "id": 41,
@@ -260,14 +260,14 @@
   {
     "id": 44,
     "name": "ตรงข้ามหมู่บ้านพิบูลย์บางซื่อ",
-    "latitude": 13.8205073,
-    "longitude": 100.5083169
+    "latitude": 13.82042,
+    "longitude": 100.50858
   },
   {
     "id": 45,
     "name": "โรงเรียนสตรีนนทบุรี",
-    "latitude": 13.8222,
-    "longitude": 100.5050709
+    "latitude": 13.8223,
+    "longitude": 100.50519
   },
   {
     "id": 46,
@@ -458,14 +458,14 @@
   {
     "id": 77,
     "name": "ตรงข้ามโรงเรียนสตรีนนทบุรี",
-    "latitude": 13.8226445,
-    "longitude": 100.5043646
+    "latitude": 13.8223,
+    "longitude": 100.5057
   },
   {
     "id": 78,
     "name": "หมู่บ้านพิบูลย์บางซื่อ",
-    "latitude": 13.8209359,
-    "longitude": 100.5068161
+    "latitude": 13.820673,
+    "longitude": 100.50858
   },
   {
     "id": 79,
@@ -482,14 +482,14 @@
   {
     "id": 81,
     "name": "ไอ คิว เซ็นเตอร์เชิงสะพานพระราม 7",
-    "latitude": 13.81781,
-    "longitude": 100.51587
+    "latitude": 13.8178,
+    "longitude": 100.51586
   },
   {
     "id": 82,
     "name": "ตรงข้ามวัดเสาหิน",
-    "latitude": 13.8187644,
-    "longitude": 100.5182012
+    "latitude": 13.81891,
+    "longitude": 100.518
   },
   {
     "id": 83,
@@ -500,38 +500,38 @@
   {
     "id": 84,
     "name": "วัดน้อย",
-    "latitude": 13.8218,
-    "longitude": 100.521098
+    "latitude": 13.82177,
+    "longitude": 100.52112
   },
   {
     "id": 85,
     "name": "ชุมชนวัดหลวง",
-    "latitude": 13.8225698,
-    "longitude": 100.521166
+    "latitude": 13.82335,
+    "longitude": 100.5229
   },
   {
     "id": 86,
     "name": "วัดเลียบ",
-    "latitude": 13.8239102,
-    "longitude": 100.5226276
+    "latitude": 13.82475,
+    "longitude": 100.52435
   },
   {
     "id": 87,
     "name": "ตรงข้ามบิ๊กซีวงศ์สว่าง",
-    "latitude": 13.8269851,
-    "longitude": 100.5263536
+    "latitude": 13.8267,
+    "longitude": 100.52649
   },
   {
     "id": 88,
     "name": "กรมยุทธบริการ",
-    "latitude": 13.8262956,
-    "longitude": 100.5295866
+    "latitude": 13.82715,
+    "longitude": 100.5299
   },
   {
     "id": 89,
     "name": "ซอยกรุงเทพ-นนทบุรี 44",
-    "latitude": 13.8260109,
-    "longitude": 100.5303895
+    "latitude": 13.82585,
+    "longitude": 100.53155
   },
   {
     "id": 90,

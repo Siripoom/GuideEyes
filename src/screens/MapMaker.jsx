@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
-import item from '../data/Bus_510.json'; // ไฟล์ JSON ที่เก็บข้อมูลทั้งหมด
+import item from '../data/Bus_97.json'; // ไฟล์ JSON ที่เก็บข้อมูลทั้งหมด
 
 const MapMaker = () => {
   const [location, setLocation] = useState({
